@@ -15,7 +15,7 @@ public class FirebaseConfig {
     @Bean
     public FirebaseApp initFirebaseApp() {
         try {
-            FileInputStream serviceAccount = new FileInputStream("src/main/resources/firebaseKey.json");
+            FileInputStream serviceAccount = new FileInputStream("user-service/src/main/resources/firebaseKey.json");
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
