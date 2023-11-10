@@ -3,11 +3,13 @@ package com.principlecoders.orderservice.services;
 import com.principlecoders.common.dto.CartItemDto;
 import com.principlecoders.common.dto.CartProductsDto;
 import com.principlecoders.common.dto.ProductDto;
+import com.principlecoders.orderservice.OrderServiceApplication;
 import com.principlecoders.orderservice.models.Cart;
 import com.principlecoders.orderservice.models.Order;
 import com.principlecoders.orderservice.repositories.CartRepository;
 import com.principlecoders.orderservice.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
@@ -82,5 +85,16 @@ public class OrderService {
 
     public  List<Order> getAllOrdersByCustomers(){
         return   orderRepository.findAll();
+    }
+
+    public void createOrder(Order orderRequest){
+        Order order=Order.builder()
+                .id(orderRequest.getId())
+                .orderNumber(orderRequest.getOrderNumber())
+                .totalAmount(orderRequest.getTotalAmount())
+                .build();
+
+        orderRepository.save(order);
+        log.info ( "orderCreated");
     }
 }

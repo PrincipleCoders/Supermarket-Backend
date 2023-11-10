@@ -32,4 +32,11 @@ public class OrderController {
         return orderService.getAllOrdersByCustomers();
 
         }
+
+        @PostMapping("/createOrders")
+    public void createOrder(@RequestBody Order order){
+            System.out.println("hi");
+        orderService.createOrder(order);
+        }
+
 }

@@ -3,6 +3,7 @@ package com.principlecoders.orderservice.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 public class Customer {
 
+    @Id
     private String id;
 
     private String firstName;
