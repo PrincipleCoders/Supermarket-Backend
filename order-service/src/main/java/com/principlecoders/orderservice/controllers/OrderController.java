@@ -20,4 +20,11 @@ public class OrderController {
     public ResponseEntity<?> addToCart(@RequestBody CartItemDto cartItemDto) {
         return orderService.addToCart(cartItemDto);
     }
+
+    @GetMapping("order/user/{userId}")
+    public ResponseEntity<?> getorderOfUser(@PathVariable String userId) {
+        return orderService.getOrderItemsOfUser(userId);
+    }
+
+
 }

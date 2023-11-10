@@ -5,6 +5,7 @@ import com.principlecoders.common.dto.CartProductsDto;
 import com.principlecoders.common.dto.ProductDto;
 import com.principlecoders.orderservice.models.Cart;
 import com.principlecoders.orderservice.repositories.CartRepository;
+import com.principlecoders.orderservice.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,30 @@ public class OrderService {
     public ResponseEntity<?> getCartItemsOfUser(String userId) {
         Cart cart = cartRepository.findByUserId(userId);
         if (cart == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<CartProductsDto> cartProductsDtos = new ArrayList<>();
+        cart.getProductsQuantity().forEach((productId, quantity) -> {
+            ProductDto productDto = webClient.get()
+                    .uri(INVENTORY_URL + "product/" + productId)
+                    .retrieve()
+                    .bodyToMono(ProductDto.class)
+                    .block();
+            cartProductsDtos.add(CartProductsDto.builder()
+                    .price(productDto.getPrice())
+                    .productId(productId)
+                    .name(productDto.getName())
+                    .image(productDto.getImage())
+                    .quantity(quantity)
+                    .build());
+        });
+        return ResponseEntity.ok(cartProductsDtos);
+    }
+
+    public ResponseEntity<?> getOrderItemsOfUser(String userId) {
+        Order order = OrderRepository.findByUserId(userId);
+        if (order == null) {
             return ResponseEntity.notFound().build();
         }
 
