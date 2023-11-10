@@ -25,5 +25,5 @@ public class Order {
     private double totalAmount;
 
     @DBRef
-    private Order customer;
+    private Order order;
 }
