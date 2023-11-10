@@ -22,13 +22,11 @@ public class OrderController {
     }
     @DeleteMapping("cart/user/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable String userId) {
-        ResponseEntity<?> responseEntity = orderService.deleteCart(userId);
-        return responseEntity;
+        return orderService.deleteCart(userId);
     }
 
     @DeleteMapping("product/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable String productId){
-        ResponseEntity<?> responseEntity = orderService.deleteCart(productId);
-        return responseEntity;
+        return orderService.deleteCart(productId);
     }
 }
