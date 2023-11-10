@@ -14,9 +14,16 @@ public class RemainingOrderDto {
     private String id;
     private Date date;
     private String userId;
+    private String name;
     private String productId;
     private int quantity;
-    private String name;
     private boolean isPacked;
+    private item[] items;
 
+}
+
+class item{
+
+    private String productId;
+    private int quantity;
 }
