@@ -22,7 +22,7 @@ public class OrderController {
     }
 
     @GetMapping("order/user/{userId}")
-    public ResponseEntity<?> getorderOfUser(@PathVariable String userId) {
+    public ResponseEntity<?> getOrderOfUser(@PathVariable String userId) {
         return orderService.getOrderItemsOfUser(userId);
     }
 

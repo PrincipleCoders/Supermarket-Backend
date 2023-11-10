@@ -50,8 +50,8 @@ public class OrderService {
     }
 
     public ResponseEntity<?> getOrderItemsOfUser(String userId) {
-        Order order = OrderRepository.findByUserId(userId);
-        if (order == null) {
+        Cart cart = OrderRepository.findByUserId(userId);
+        if (cart == null) {
             return ResponseEntity.notFound().build();
         }
 
