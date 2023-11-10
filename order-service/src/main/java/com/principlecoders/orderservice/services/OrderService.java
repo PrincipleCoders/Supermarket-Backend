@@ -4,7 +4,9 @@ import com.principlecoders.common.dto.CartItemDto;
 import com.principlecoders.common.dto.CartProductsDto;
 import com.principlecoders.common.dto.ProductDto;
 import com.principlecoders.orderservice.models.Cart;
+import com.principlecoders.orderservice.models.Order;
 import com.principlecoders.orderservice.repositories.CartRepository;
+import com.principlecoders.orderservice.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
 @RequiredArgsConstructor
 public class OrderService {
     private final CartRepository cartRepository;
+    private final OrderRepository orderRepository;
     private final WebClient webClient;
 
     public ResponseEntity<?> getCartItemsOfUser(String userId) {
@@ -75,5 +78,9 @@ public class OrderService {
             Cart updatedCart = cartRepository.save(cart);
             return ResponseEntity.ok(updatedCart);
         }
+    }
+
+    public  List<Order> getAllOrdersByCustomers(){
+        return   orderRepository.findAll();
     }
 }
