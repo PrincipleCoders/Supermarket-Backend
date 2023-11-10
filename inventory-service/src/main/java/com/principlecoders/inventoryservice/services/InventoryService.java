@@ -1,7 +1,11 @@
 package com.principlecoders.inventoryservice.services;
 
+import com.principlecoders.common.dto.ProductDto;
+import com.principlecoders.inventoryservice.models.Product;
 import com.principlecoders.inventoryservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +28,21 @@ public class InventoryService {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(productRepository.findById(productId));
+    }
+
+    public ResponseEntity<?> addProduct(ProductDto productDto) {
+        Product product = Product.builder()
+                .name(productDto.getName())
+                .description(productDto.getDescription())
+                .image(productDto.getImage())
+                .price(productDto.getPrice())
+                .quantity(productDto.getQuantity())
+                .rating(productDto.getRating())
+                .supplier(productDto.getSupplier())
+                .category(productDto.getCategory())
+                .build();
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(productRepository.save(product));
     }
 }
