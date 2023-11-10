@@ -27,4 +27,8 @@ public class OrderController {
     }
 
     @DeleteMapping("product/{productId}")
+    public ResponseEntity<?> deleteProduct(@PathVariable String productId){
+        ResponseEntity<?> responseEntity = orderService.deleteCart(productId);
+        return responseEntity;
+    }
 }
