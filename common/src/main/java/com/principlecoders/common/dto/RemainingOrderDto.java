@@ -16,6 +16,7 @@ public class RemainingOrderDto {
     private String userId;
     private String productId;
     private int quantity;
+    private String name;
     private boolean isPacked;
 
 }
