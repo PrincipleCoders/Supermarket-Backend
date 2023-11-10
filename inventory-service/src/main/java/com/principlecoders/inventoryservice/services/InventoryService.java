@@ -29,7 +29,6 @@ public ResponseEntity<?> getAllProducts() {
     }
     return ResponseEntity.ok(products);
 }
-
     public ResponseEntity<?> getProductById(String productId) {
         if (productRepository.findById(productId).isEmpty()) {
             return ResponseEntity.notFound().build();
