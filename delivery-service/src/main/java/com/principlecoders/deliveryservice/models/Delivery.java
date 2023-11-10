@@ -12,5 +12,6 @@ import java.util.Map;
 public class Delivery {
     private String id;
     private String userId;
-    private Boolean isMarked;
+    private Boolean markToDeliver;
+    private Boolean isDelivered;
 }
