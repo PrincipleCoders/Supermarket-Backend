@@ -22,6 +22,13 @@ public class InventoryService {
 //        }
 //        return ResponseEntity.ok(productRepository.findAllById(productIds));
 //    }
+public ResponseEntity<?> getAllProducts() {
+    List<Product> products = productRepository.findAll();
+    if (products.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(products);
+}
 
     public ResponseEntity<?> getProductById(String productId) {
         if (productRepository.findById(productId).isEmpty()) {
