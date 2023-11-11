@@ -13,12 +13,25 @@ public class DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
 
+
     public Delivery updateMarkToDeliver(String deliveryId, Boolean newMarkToDeliver) {
         Optional<Delivery> optionalDelivery = deliveryRepository.findById(deliveryId);
 
         if (optionalDelivery.isPresent()) {
             Delivery delivery = optionalDelivery.get();
             delivery.setMarkToDeliver(newMarkToDeliver);
+            return deliveryRepository.save(delivery);
+        } else {
+            return null; // Delivery not found
+        }
+    }
+
+    public Delivery updateDelivered(String deliveryId, Boolean isDelivered) {
+        Optional<Delivery> optionalDelivery = deliveryRepository.findById(deliveryId);
+
+        if (optionalDelivery.isPresent()) {
+            Delivery delivery = optionalDelivery.get();
+            delivery.setIsDelivered(isDelivered);
             return deliveryRepository.save(delivery);
         } else {
             return null; // Delivery not found

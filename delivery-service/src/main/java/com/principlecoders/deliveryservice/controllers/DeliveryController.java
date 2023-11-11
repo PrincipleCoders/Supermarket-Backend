@@ -34,6 +34,22 @@ public class DeliveryController {
         }
     }
 
+    @PutMapping("/updateDelivered/{deliveryId}")
+    public ResponseEntity<Delivery> updateDelivered(
+            @PathVariable String deliveryId,
+            @RequestBody Map<String, Boolean> deliveredStatus) {
+
+        Boolean isDelivered = deliveredStatus.get("isDelivered");
+
+        Delivery updatedDelivery = deliveryService.updateDelivered(deliveryId, isDelivered);
+
+        if (updatedDelivery != null) {
+            return new ResponseEntity<>(updatedDelivery, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Delivery> createDelivery(@RequestBody Delivery newDelivery) {
         Delivery createdDelivery = deliveryService.createDelivery(newDelivery);
