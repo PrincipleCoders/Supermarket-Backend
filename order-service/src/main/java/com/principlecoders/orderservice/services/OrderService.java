@@ -76,4 +76,8 @@ public class OrderService {
             return ResponseEntity.ok(updatedCart);
         }
     }
+
+    public ResponseEntity<?> getRemainingOrders() {
+
+    }
 }

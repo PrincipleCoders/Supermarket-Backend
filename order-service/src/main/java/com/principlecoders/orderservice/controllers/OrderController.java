@@ -1,6 +1,7 @@
 package com.principlecoders.orderservice.controllers;
 
 import com.principlecoders.common.dto.CartItemDto;
+import com.principlecoders.common.dto.RemainingOrderDto;
 import com.principlecoders.orderservice.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,5 +20,10 @@ public class OrderController {
     @PostMapping("cart")
     public ResponseEntity<?> addToCart(@RequestBody CartItemDto cartItemDto) {
         return orderService.addToCart(cartItemDto);
+    }
+
+    @GetMapping("orders/remaining")
+    public ResponseEntity<?> getRemainingOrders() {
+        return orderService.getRemainingOrders();
     }
 }
