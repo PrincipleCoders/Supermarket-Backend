@@ -1,14 +1,31 @@
 package com.principlecoders.deliveryservice.services;
 
-import com.principlecoders.deliveryservice.DeliveryServiceApplication;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
+import com.principlecoders.deliveryservice.models.Delivery;
+import com.principlecoders.deliveryservice.repositories.DeliveryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-@SpringBootApplication
-@ComponentScan(basePackages = "com.principlecoders")
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
 public class DeliveryService {
-    public static void main(String[] args) {
-        SpringApplication.run(DeliveryServiceApplication.class, args);
+
+    private final DeliveryRepository deliveryRepository;
+
+    public Delivery updateMarkToDeliver(String deliveryId, Boolean newMarkToDeliver) {
+        Optional<Delivery> optionalDelivery = deliveryRepository.findById(deliveryId);
+
+        if (optionalDelivery.isPresent()) {
+            Delivery delivery = optionalDelivery.get();
+            delivery.setMarkToDeliver(newMarkToDeliver);
+            return deliveryRepository.save(delivery);
+        } else {
+            return null; // Delivery not found
+        }
+    }
+
+    public Delivery createDelivery(Delivery newDelivery) {
+        return deliveryRepository.save(newDelivery);
     }
 }
