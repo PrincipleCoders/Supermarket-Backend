@@ -3,9 +3,11 @@ package com.principlecoders.orderservice.services;
 import com.principlecoders.common.dto.CartItemDto;
 import com.principlecoders.common.dto.CartProductsDto;
 import com.principlecoders.common.dto.ProductDto;
+import com.principlecoders.common.dto.UserRoleDto;
 import com.principlecoders.orderservice.OrderServiceApplication;
 import com.principlecoders.orderservice.models.Cart;
 import com.principlecoders.orderservice.models.Order;
+import com.principlecoders.orderservice.models.OrderLineItems;
 import com.principlecoders.orderservice.repositories.CartRepository;
 import com.principlecoders.orderservice.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
 
@@ -83,18 +82,51 @@ public class OrderService {
         }
     }
 
+
+    //Get list of orders customer made
     public  List<Order> getAllOrdersByCustomers(){
         return   orderRepository.findAll();
     }
 
-    public void createOrder(Order orderRequest){
-        Order order=Order.builder()
-                .id(orderRequest.getId())
-                .orderNumber(orderRequest.getOrderNumber())
-                .totalAmount(orderRequest.getTotalAmount())
-                .build();
+//    public void createOrder(Order orderRequest){
+//        Order order=Order.builder()
+//                .id(orderRequest.getId())
+//                .orderNumber(orderRequest.getOrderNumber())
+////                .totalAmount(orderRequest.getTotalAmount())
+//                .build();
+//
+//        orderRepository.save(order);
+//        log.info ( "orderCreated");
+//    }
 
+
+    //plcae Order by customer
+    public  void placeOrder(Order orderRequest){
+        Order order=new Order();
+        order.setOrderNumber(UUID.randomUUID().toString());
+        List<OrderLineItems>orderLineItems=orderRequest.getOrderLineItemsList().stream()
+                .map(this::mapToDto)
+                .toList();
+        order.setOrderLineItemsList(orderLineItems);
         orderRepository.save(order);
-        log.info ( "orderCreated");
+    }
+
+    private  OrderLineItems mapToDto(OrderLineItems orderLineItems){
+        OrderLineItems orderLineItems1=new OrderLineItems();
+        orderLineItems1.setPrice(orderLineItems.getPrice());
+        orderLineItems1.setQauntity(orderLineItems.getQauntity());
+        orderLineItems1.setSkuCode(orderLineItems.getSkuCode());
+
+        return  orderLineItems1;
+    }
+
+    //Get some  customer details for combining order details
+    public void getUser(UserRoleDto userRoleDto){
+        UserRoleDto user=new UserRoleDto();
+        user.getUserId();
+
+
+
+
     }
 }

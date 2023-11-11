@@ -8,10 +8,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 
 
 @Document(value = "orders")
@@ -22,8 +25,12 @@ public class Order {
 
     private String id;
     private String orderNumber;
-    private double totalAmount;
+//    private double totalAmount;
 
-    @DBRef
-    private Order order;
+    private List<OrderLineItems> orderLineItemsList;
+
+
+
+//    @DBRef
+//    private Order order;
 }
