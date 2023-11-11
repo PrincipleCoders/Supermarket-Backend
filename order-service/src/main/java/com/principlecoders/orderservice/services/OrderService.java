@@ -3,6 +3,7 @@ package com.principlecoders.orderservice.services;
 import com.principlecoders.common.dto.CartItemDto;
 import com.principlecoders.common.dto.CartProductsDto;
 import com.principlecoders.common.dto.ProductDto;
+import com.principlecoders.common.dto.OrderProductDto;
 import com.principlecoders.orderservice.models.Cart;
 import com.principlecoders.orderservice.models.Order;
 import com.principlecoders.orderservice.repositories.CartRepository;
@@ -88,7 +89,7 @@ public class OrderService {
             return ResponseEntity.notFound().build();
         }
 
-        List<CartProductsDto> orderProductsDtos = new ArrayList<>();
+        List<OrderProductDto> orderProductDtos = new ArrayList<>();
         orders.forEach(order -> {
             order.getProductsQuantity().forEach((productId, quantity) -> {
                 ProductDto productDto = webClient.get()
@@ -96,19 +97,22 @@ public class OrderService {
                         .retrieve()
                         .bodyToMono(ProductDto.class)
                         .block();
-                orderProductsDtos.add(CartProductsDto.builder()
-                        .date(order.getDate())  // Use 'date' here
+                orderProductDtos.add(OrderProductDto.builder()
+                        .id(order.getId())
                         .productId(productId)
                         .name(productDto.getName())
-                        .image(productDto.getImage())
                         .quantity(quantity)
+                        .price(productDto.getPrice()) // Assuming price is available in ProductDto
+                        .image(productDto.getImage())
+                        .date(order.getDate())
                         .build());
             });
         });
 
-        return ResponseEntity.ok(orderProductsDtos);
+        return ResponseEntity.ok(orderProductDtos);
     }
-}
+
+
 
 
 
