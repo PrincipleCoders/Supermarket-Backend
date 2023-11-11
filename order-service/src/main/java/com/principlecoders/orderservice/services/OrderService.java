@@ -20,6 +20,7 @@ import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
 
 @Service
 @RequiredArgsConstructor
+
 public class OrderService {
     private final CartRepository cartRepository;
     private final WebClient webClient;
@@ -74,6 +75,36 @@ public class OrderService {
             cart.setProductsQuantity(productsQuantity);
             Cart updatedCart = cartRepository.save(cart);
             return ResponseEntity.ok(updatedCart);
+        }
+    }
+
+    public ResponseEntity<?> deleteCart(String cartItemDto){
+        Cart cart = cartRepository.findByUserId(cartItemDto.getUserId());
+        if(cart!=null){
+            // Modify the cart in-memory
+            List<CartProductsDto> cartItems = cart.getCartItems();
+
+            // Find the item in the list
+            CartItemDto itemToRemove = cartItems.stream()
+                    .filter(item -> item.getItemId().equals(cartItemDto.getItemId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (itemToRemove != null) {
+                // Remove the item from the list
+                cartItems.remove(itemToRemove);
+
+                // Save the updated cart back to MongoDB
+                cartRepository.save(cart);
+
+                return ResponseEntity.ok("Item deleted from the cart");
+            } else {
+                // If the item is not found in the cart
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found in the cart");
+            }
+        } else {
+            // If the cart is not found for the given userId
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart not found for the user");
         }
     }
 }
