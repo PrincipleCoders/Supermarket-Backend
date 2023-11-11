@@ -34,12 +34,11 @@ public class AuthService {
 
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .header("Authorization", "Bearer "+newToken)
-                    .header("Role", String.valueOf(userRoles))
-                    .header("Email_Verified", String.valueOf(emailVerified))
                     .body(
-                            ResponseMessage.builder()
-                                    .message("Login successful")
-                                    .build()
+                            new Object() {
+                                final Object user = userRecord;
+                                final boolean isEmailVerified = emailVerified;
+                            }
                     );
         }
         catch (Exception e) {
@@ -72,6 +71,29 @@ public class AuthService {
                     .body(
                             ResponseMessage.builder()
                                     .message("Role set failed")
+                                    .error(e.getMessage())
+                                    .build()
+                    );
+        }
+    }
+
+    public ResponseEntity<?> validateToken(String token) {
+        try {
+            firebaseAuth.verifyIdToken(token);
+
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .header("Authorization", "Bearer "+token)
+                    .body(
+                            ResponseMessage.builder()
+                                    .message("Token validated successfully")
+                                    .build()
+                    );
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                            ResponseMessage.builder()
+                                    .message("Token validation failed")
                                     .error(e.getMessage())
                                     .build()
                     );
