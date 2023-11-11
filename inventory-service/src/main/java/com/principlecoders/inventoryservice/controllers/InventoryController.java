@@ -23,7 +23,7 @@ public class InventoryController {
 
 
     //Add the new product to inventory
-    @PostMapping("/addProduct")
+    @PostMapping("/addProducts")
     @ResponseStatus(HttpStatus.CREATED)
 
     public void createdProduct(@RequestBody Product productRequest){
