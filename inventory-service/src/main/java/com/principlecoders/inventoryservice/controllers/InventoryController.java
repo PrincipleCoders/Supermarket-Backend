@@ -21,6 +21,8 @@ public class InventoryController {
         return inventoryService.getProductById(productId);
     }
 
+
+    //Add the new product to inventory
     @PostMapping("/addProduct")
     @ResponseStatus(HttpStatus.CREATED)
 
@@ -28,19 +30,20 @@ public class InventoryController {
         inventoryService.createProduct(productRequest);
 
     }
+
+    //Update a Product details
     @PutMapping("{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable String id,@RequestBody Product product){
         return inventoryService.updateProduct(id,product);
     }
 
+
+    //Get all products from database
     @GetMapping("/allProduct")
 
     public List<Product> getAllProducts(){
      return    inventoryService.getAllProducts();
     }
 
-//    @GetMapping("/allProduct")
-//    public ResponseEntity<?> getProductById() {
-//        return inventoryService.getAllProducts();
-//    }
+
 }

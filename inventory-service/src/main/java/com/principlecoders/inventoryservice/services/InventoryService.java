@@ -29,7 +29,7 @@ public class InventoryService {
         return ResponseEntity.ok(productRepository.findById(productId));
     }
 
-    //Add product to mongodb database
+    //Add product to inventory
     public void createProduct(Product productRequest){
         Product product=Product.builder()
                 .name(productRequest.getName())
@@ -46,6 +46,7 @@ public class InventoryService {
         log.info("product {} is saved",product.getId());
     }
 
+    //update a product
     public ResponseEntity<Product> updateProduct(String id,Product product){
         Product updateProduct=productRepository.findById(id).orElse(null);
         updateProduct.setName(product.getName());
@@ -58,6 +59,7 @@ public class InventoryService {
 
 
 
+    //Get all products
     public List<Product> getAllProducts()
     {
         return productRepository.findAll();
