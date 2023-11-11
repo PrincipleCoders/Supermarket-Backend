@@ -3,7 +3,10 @@ package com.principlecoders.apigateway.filters;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -12,11 +15,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class FirebaseTokenValidatorFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         String token = extractToken(request);
 
         if (token != null) {
@@ -46,13 +54,16 @@ public class FirebaseTokenValidatorFilter extends OncePerRequestFilter {
     }
 
     private Authentication createAuthenticationFromToken(FirebaseToken firebaseToken) {
-        // Create and return an Authentication object based on the FirebaseToken.
-        // You may need to map Firebase claims to user roles or authorities.
-        // For example:
-        // Collection<? extends GrantedAuthority> authorities = getAuthoritiesFromClaims(firebaseToken.getClaims());
-        // return new UsernamePasswordAuthenticationToken(firebaseToken, null, authorities);
+        Collection<? extends GrantedAuthority> authorities = getAuthoritiesFromClaims(firebaseToken.getClaims());
+        return new UsernamePasswordAuthenticationToken(firebaseToken, null, authorities);
+    }
 
-        // Replace the return statement with your logic.
-        return null;
+    private Collection<? extends GrantedAuthority> getAuthoritiesFromClaims(Map<String, Object> claims) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if (claims.containsKey("role")) {
+            String role = (String) claims.get("role");
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
+        return authorities;
     }
 }
