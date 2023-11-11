@@ -79,40 +79,48 @@ public class OrderService {
         }
     }
 
-    public ResponseEntity<?> getRemainingOrders() {
-        Order order=cartRepository.findAllByisPacked();
-        return null;
+    public ResponseEntity<List<RemainingOrderDto>> getUnpackedOrders() {
+        List<Order> unpackedOrders = orderRepository.findByIsPackedFalse();
+
+        List<RemainingOrderDto> remainingOrderDtos = unpackedOrders.stream()
+                .map(order -> convertToRemainingOrderDto(order))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(remainingOrderDtos);
     }
 
-    List<RemainingOrderDto> remainingOrderDtos = new ArrayList<>();
-        cart.getProductsName().forEach((productId) -> {
-        ProductDto productDto = webClient.getProduct()
+    public String getProduct(String productId) {
+        // Call inventory service to get product name based on productId
+        return webClient.get()
                 .uri(INVENTORY_URL + "product/" + productId)
                 .retrieve()
-                .bodyToMono(ProductDto.class)
+                .bodyToMono(String.class)
                 .block();
+    }
 
-        user.getUserName().forEach((userId) -> {
-            ProductDto productDto = webClient.getUser()
-                    .uri(INVENTORY_URL + "user/" + userId)
-                    .retrieve()
-                    .bodyToMono(ProductDto.class)
-                    .block();
+    public String getUser(String userId) {
+        // Call user service to get user name based on userId
+        return webClient.get()
+                .uri(USER_URL + userId)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
 
-        remainingOrderDtos.add(remainingOrderDtos.builder()
-                .orderId(orderId)
-                .date(date)
-                .userid(userId)
-                .image(productDto.getImage())
-                .quantity(quantity)
-                .build());
-    });
-        public void getProduct(){
+    private RemainingOrderDto convertToRemainingOrderDto(Order order) {
+        // Fetch user and product names
+        String userName = getUser(order.getUserId());
+        String productName = getProduct(order.getProductId());
 
-        }
-
-        public void getUser(){
-
-        }
+        // Create RemainingOrderDto
+        return RemainingOrderDto.builder()
+                .id(order.getId())
+                .date(order.getDate())
+                .customer(userName)
+                .items(List.of(new RemainingOrderDto.Item(productName, order.getQuantity())))
+                .isPacked(order.isPacked())
+                .build();
+    }
+}
 
 }
