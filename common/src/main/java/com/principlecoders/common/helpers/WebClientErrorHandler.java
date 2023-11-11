@@ -8,6 +8,9 @@ import reactor.core.publisher.Mono;
 @Service
 public class WebClientErrorHandler {
     public Mono<? extends ResponseEntity<Object>> handle(Throwable error) {
+        if (!(error instanceof WebClientResponseException)) {
+            return Mono.error(error);
+        }
         WebClientResponseException exception = (WebClientResponseException) error;
         return Mono.just(
                 ResponseEntity.status(exception.getStatusCode())
