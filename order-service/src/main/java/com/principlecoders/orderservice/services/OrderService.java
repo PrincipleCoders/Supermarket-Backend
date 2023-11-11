@@ -79,5 +79,6 @@ public class OrderService {
 
     public ResponseEntity<?> getRemainingOrders() {
 
+        return null;
     }
 }
