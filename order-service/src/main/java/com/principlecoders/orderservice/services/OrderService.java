@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
+import static com.principlecoders.common.utils.ServiceUrls.USER_URL;
 
 @Service
 @RequiredArgsConstructor
@@ -80,7 +82,7 @@ public class OrderService {
     }
 
     public ResponseEntity<List<RemainingOrderDto>> getUnpackedOrders() {
-        List<Order> unpackedOrders = orderRepository.findByIsPackedFalse();
+        List<Order> unpackedOrders = OrderRepository.findByIsPackedFalse();
 
         List<RemainingOrderDto> remainingOrderDtos = unpackedOrders.stream()
                 .map(order -> convertToRemainingOrderDto(order))
@@ -109,8 +111,8 @@ public class OrderService {
 
     private RemainingOrderDto convertToRemainingOrderDto(Order order) {
         // Fetch user and product names
-        String userName = getUser(order.getUserId());
-        String productName = getProduct(order.getProductId());
+        String userName = getUser(order.getUser());
+        String productName = getProduct(order.getProduct());
 
         // Create RemainingOrderDto
         return RemainingOrderDto.builder()
@@ -121,6 +123,17 @@ public class OrderService {
                 .isPacked(order.isPacked())
                 .build();
     }
+
+    public void getProduct(){
+
+    }
+
+    public void getUser(){
+
+    }
 }
 
-}
+
+
+
+
