@@ -29,6 +29,7 @@ public class InventoryService {
         return ResponseEntity.ok(productRepository.findById(productId));
     }
 
+    //Add product to mongodb database
     public void createProduct(Product productRequest){
         Product product=Product.builder()
                 .name(productRequest.getName())
@@ -36,12 +37,29 @@ public class InventoryService {
                 .category(productRequest.getCategory())
                 .rating(productRequest.getRating())
                 .supplier(productRequest.getSupplier())
-               .price((productRequest.getPrice()))
+                .price((productRequest.getPrice()))
                 .quantity(productRequest.getQuantity())
                 .image(productRequest.getImage())
                 .build();
 
         productRepository.save(product);
         log.info("product {} is saved",product.getId());
+    }
+
+    public ResponseEntity<Product> updateProduct(String id,Product product){
+        Product updateProduct=productRepository.findById(id).orElse(null);
+        updateProduct.setName(product.getName());
+        updateProduct.setDescription(product.getDescription());
+        updateProduct.setCategory(product.getCategory());
+
+        productRepository.save(updateProduct);
+        return ResponseEntity.ok(updateProduct);
+    }
+
+
+
+    public List<Product> getAllProducts()
+    {
+        return productRepository.findAll();
     }
 }
