@@ -1,8 +1,9 @@
-package com.principlecoders.orderservice.models;import lombok.*;
+package com.principlecoders.orderservice.models;
 
 import lombok.*;
 
 import java.util.Map;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,6 +13,6 @@ import java.util.Map;
 public class Order {
     private String id;
     private String userId;
-    private int price;
+    private LocalDateTime date;
     private Map<String, Integer> productsQuantity;
 }
