@@ -3,9 +3,11 @@ package com.principlecoders.orderservice.services;
 import com.principlecoders.common.dto.CartItemDto;
 import com.principlecoders.common.dto.CartProductsDto;
 import com.principlecoders.common.dto.ProductDto;
+import com.principlecoders.common.dto.RemainingOrderDto;
 import com.principlecoders.orderservice.models.Cart;
 import com.principlecoders.orderservice.repositories.CartRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -78,7 +80,39 @@ public class OrderService {
     }
 
     public ResponseEntity<?> getRemainingOrders() {
-
+        Order order=cartRepository.findAllByisPacked();
         return null;
     }
+
+    List<RemainingOrderDto> remainingOrderDtos = new ArrayList<>();
+        cart.getProductsName().forEach((productId) -> {
+        ProductDto productDto = webClient.getProduct()
+                .uri(INVENTORY_URL + "product/" + productId)
+                .retrieve()
+                .bodyToMono(ProductDto.class)
+                .block();
+
+        user.getUserName().forEach((userId) -> {
+            ProductDto productDto = webClient.getUser()
+                    .uri(INVENTORY_URL + "user/" + userId)
+                    .retrieve()
+                    .bodyToMono(ProductDto.class)
+                    .block();
+
+        remainingOrderDtos.add(remainingOrderDtos.builder()
+                .orderId(orderId)
+                .date(date)
+                .userid(userId)
+                .image(productDto.getImage())
+                .quantity(quantity)
+                .build());
+    });
+        public void getProduct(){
+
+        }
+
+        public void getUser(){
+
+        }
+
 }
