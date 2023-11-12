@@ -1,9 +1,6 @@
 package com.principlecoders.orderservice.services;
 
-import com.principlecoders.common.dto.CartItemDto;
-import com.principlecoders.common.dto.CartProductsDto;
-import com.principlecoders.common.dto.ProductDto;
-import com.principlecoders.common.dto.OrderDetailsDto;
+import com.principlecoders.common.dto.*;
 import com.principlecoders.orderservice.models.Cart;
 import com.principlecoders.orderservice.models.Order;
 import com.principlecoders.orderservice.repositories.CartRepository;
