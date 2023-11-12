@@ -3,8 +3,8 @@ package com.principlecoders.userservice.services;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
+import com.principlecoders.common.dto.AuthResultDto;
 import com.principlecoders.common.dto.ResponseMessage;
-import com.principlecoders.common.dto.UserDto;
 import com.principlecoders.common.utils.UserRoles;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,14 +36,20 @@ public class AuthService {
 //            }
 
             String newToken = firebaseAuth.createCustomToken(uid);
+            String address = (String) userRecord.getCustomClaims().get("address");
+            String telephone = (String) userRecord.getCustomClaims().get("telephone");
 
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .header("Authorization", "Bearer "+newToken)
-                    .body(UserDto.builder()
+                    .body(AuthResultDto.builder()
                             .id(uid)
                             .email(userRecord.getEmail())
                             .name(userRecord.getDisplayName())
                             .role(UserRoles.valueOf(userRole))
+                            .isEmailVerified(emailVerified)
+                            .telephone(telephone)
+                            .address(address)
+                            .imageUrl(userRecord.getPhotoUrl())
                             .build()
                     );
         }
@@ -62,14 +68,13 @@ public class AuthService {
     public ResponseEntity<?> setUserRole(String uid, UserRoles role) {
         try {
             Map<String, Object> claims = new HashMap<>();
-            claims.put("Role", String.valueOf(role));
+            claims.put("role", String.valueOf(role));
             firebaseAuth.setCustomUserClaims(uid, claims);
 
             return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .header("Role", String.valueOf(role))
                     .body(
                             ResponseMessage.builder()
-                                    .message("Role set successful")
+                                    .message(role +" role set successful")
                                     .build()
                     );
         }

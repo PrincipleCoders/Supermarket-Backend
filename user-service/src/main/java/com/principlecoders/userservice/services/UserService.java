@@ -1,76 +1,65 @@
 package com.principlecoders.userservice.services;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.GetUsersResult;
-import com.google.firebase.auth.UserIdentifier;
 import com.principlecoders.common.dto.AdditionalDataDto;
+import com.principlecoders.common.dto.AuthResultDto;
 import com.principlecoders.common.dto.UserDto;
 import com.principlecoders.common.utils.UserRoles;
-import com.principlecoders.userservice.models.UserAdditionalData;
-import com.principlecoders.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
     private final FirebaseAuth firebaseAuth;
 
     public ResponseEntity<?> updateAdditionalData(AdditionalDataDto additionalData) {
-        Optional<UserAdditionalData> userAdditionalData = userRepository.findById(additionalData.getId());
-        if (userAdditionalData.isEmpty()) {
-            UserAdditionalData data = UserAdditionalData.builder()
-                    .id(additionalData.getId())
-                    .address(additionalData.getAddress())
-                    .phone(additionalData.getPhone())
-                    .build();
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("address", additionalData.getAddress());
+        claims.put("telephone", additionalData.getPhone());
+        try {
+            firebaseAuth.setCustomUserClaims(additionalData.getId(), claims);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(userRepository.save(data));
-        }
-        else {
-            UserAdditionalData data = UserAdditionalData.builder()
-                    .id(additionalData.getId())
-                    .address(additionalData.getAddress())
-                    .phone(additionalData.getPhone())
-                    .build();
+                    .body(claims);
+        } catch (FirebaseAuthException e) {
             return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(userRepository.save(data));
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
         }
     }
 
     public ResponseEntity<?> getAllUsers() {
         try {
             GetUsersResult users = firebaseAuth.getUsers(null);
-            List<UserAdditionalData> usersData = userRepository.findAll();
 
-            List<UserDto> usersDto = new ArrayList<>();
+            List<AuthResultDto> authResultDtos = new ArrayList<>();
             users.getUsers().forEach(user -> {
                 UserRoles role = UserRoles.valueOf(user.getCustomClaims().get("role").toString());
-                Optional<UserAdditionalData> userData = usersData.stream().filter(data -> data.getId().equals(user.getUid())).findFirst();
-                UserDto userDto = UserDto.builder()
+                String address = user.getCustomClaims().get("address").toString();
+                String telephone = user.getCustomClaims().get("telephone").toString();
+
+                AuthResultDto authResultDto = AuthResultDto.builder()
                         .id(user.getUid())
                         .email(user.getEmail())
-                        .telephone(user.getPhoneNumber())
-                        .address(userData.isEmpty() ? "" : userData.get().getAddress())
-                        .firstName(user.getDisplayName().split(" ")[0])
-                        .lastName(user.getDisplayName().split(" ")[1])
+                        .name(user.getDisplayName())
                         .role(role)
+                        .isEmailVerified(user.isEmailVerified())
+                        .address(address)
+                        .telephone(telephone)
+                        .imageUrl(user.getPhotoUrl())
                         .build();
-                usersDto.add(userDto);
+                authResultDtos.add(authResultDto);
             });
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(usersDto);
+                    .body(authResultDtos);
         }
         catch (Exception e) {
             return ResponseEntity
