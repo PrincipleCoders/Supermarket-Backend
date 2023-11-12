@@ -19,7 +19,7 @@ public class InventoryService {
     public ResponseEntity<?> getAllProducts() {
         List<Product> products = productRepository.findAll();
         if (products.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok(products);
     }
