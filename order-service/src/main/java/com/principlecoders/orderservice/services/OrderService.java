@@ -155,6 +155,40 @@ public class OrderService {
         return ResponseEntity.ok(customerOrderDtos);
     }
 
+    public ResponseEntity<?> checkout(String userId) {
+        Cart cart = cartRepository.findByUserId(userId);
+        if (cart == null || cart.getProductsQuantity().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        List<OrderProduct> orderProducts = new ArrayList<>();
+        cart.getProductsQuantity().forEach((productId, quantity) -> {
+            ProductDto productDto = getProductFromService(productId);
+            orderProducts.add(OrderProduct.builder()
+                    .productId(productId)
+                    .quantity(quantity)
+                    .price(productDto.getPrice())
+                    .build());
+
+            decreaseProductQuantityFromService(productId, quantity);
+        });
+
+        Order newOrder = orderRepository.save(Order.builder()
+                .userId(userId)
+                .orderProducts(orderProducts)
+                .date(new Date())
+                .status("processing")
+                .isPacked(false)
+                .build());
+
+        if (newOrder.getId() != null) {
+            cartRepository.delete(cart);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newOrder);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
 
 
@@ -214,36 +248,15 @@ public class OrderService {
                 .block();
     }
 
-    public ResponseEntity<?> checkout(String userId) {
-        Cart cart = cartRepository.findByUserId(userId);
-        if (cart == null || cart.getProductsQuantity().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
 
-        List<OrderProduct> orderProducts = new ArrayList<>();
-        cart.getProductsQuantity().forEach((productId, quantity) -> {
-            ProductDto productDto = getProductFromService(productId);
-            orderProducts.add(OrderProduct.builder()
-                    .productId(productId)
-                    .quantity(quantity)
-                    .price(productDto.getPrice())
-                    .build());
-        });
-
-        Order newOrder = orderRepository.save(Order.builder()
-                .userId(userId)
-                .orderProducts(orderProducts)
-                .date(new Date())
-                .status("processing")
-                .isPacked(false)
-                .build());
-
-        if (newOrder.getId() != null) {
-            cartRepository.delete(cart);
-            return ResponseEntity.status(HttpStatus.CREATED).body(newOrder);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    private ProductDto decreaseProductQuantityFromService(String productId, int decrement) {
+        return webClient.put()
+                .uri(INVENTORY_URL + "product/" + productId + "/quantity/decrease")
+                .body(decrement, Integer.class)
+                .header("api-key", INVENTORY_API_KEY)
+                .retrieve()
+                .bodyToMono(ProductDto.class)
+                .block();
     }
 }
 
