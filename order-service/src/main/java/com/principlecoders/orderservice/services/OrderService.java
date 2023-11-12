@@ -1,13 +1,11 @@
 package com.principlecoders.orderservice.services;
 
-import com.principlecoders.common.dto.CartItemDto;
-import com.principlecoders.common.dto.CartProductsDto;
-import com.principlecoders.common.dto.ProductDto;
-import com.principlecoders.common.dto.RemainingOrderDto;
+import com.principlecoders.common.dto.*;
 import com.principlecoders.orderservice.models.Cart;
+import com.principlecoders.orderservice.models.Order;
 import com.principlecoders.orderservice.repositories.CartRepository;
+import com.principlecoders.orderservice.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,8 +15,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static com.principlecoders.common.utils.ServiceApiKeys.INVENTORY_API_KEY;
+import static com.principlecoders.common.utils.ServiceApiKeys.USER_API_KEY;
 import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
 import static com.principlecoders.common.utils.ServiceUrls.USER_URL;
 
@@ -26,6 +25,7 @@ import static com.principlecoders.common.utils.ServiceUrls.USER_URL;
 @RequiredArgsConstructor
 public class OrderService {
     private final CartRepository cartRepository;
+    private final OrderRepository orderRepository;
     private final WebClient webClient;
 
     public ResponseEntity<?> getCartItemsOfUser(String userId) {
@@ -38,6 +38,7 @@ public class OrderService {
         cart.getProductsQuantity().forEach((productId, quantity) -> {
             ProductDto productDto = webClient.get()
                     .uri(INVENTORY_URL + "product/" + productId)
+                    .header("api-key", INVENTORY_API_KEY)
                     .retrieve()
                     .bodyToMono(ProductDto.class)
                     .block();
@@ -81,55 +82,56 @@ public class OrderService {
         }
     }
 
-    public ResponseEntity<List<RemainingOrderDto>> getUnpackedOrders() {
-        List<Order> unpackedOrders = OrderRepository.findByIsPackedFalse();
+    public ResponseEntity<?> getRemainingOrders() {
+        List<Order> remainingOrders = orderRepository.findAllByPackedIsFalse();
 
-        List<RemainingOrderDto> remainingOrderDtos = unpackedOrders.stream()
-                .map(order -> convertToRemainingOrderDto(order))
-                .collect(Collectors.toList());
+        if (remainingOrders.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        else {
+            List<RemainingOrderDto> remainingOrderDtos = new ArrayList<>();
+            remainingOrders.forEach(order -> {
+                String customer = getUserFromService(order.getUserId()).getName();
+                List<ItemQuantity> items = new ArrayList<>();
 
-        return ResponseEntity.ok(remainingOrderDtos);
+                order.getOrderProducts().forEach(orderProduct -> {
+                    String productName = getProductFromService(orderProduct.getProductId()).getName();
+                    items.add(ItemQuantity.builder()
+                            .item(productName)
+                            .quantity(orderProduct.getQuantity())
+                            .build());
+                });
+
+                remainingOrderDtos.add(RemainingOrderDto.builder()
+                        .id(order.getId())
+                        .date(order.getDate())
+                        .customer(customer)
+                        .items(items)
+                        .isPacked(order.isPacked())
+                        .build());
+            });
+            return ResponseEntity.ok(remainingOrderDtos);
+        }
     }
 
-    public String getProduct(String productId) {
-        // Call inventory service to get product name based on productId
+
+
+    private ProductDto getProductFromService(String productId) {
         return webClient.get()
                 .uri(INVENTORY_URL + "product/" + productId)
+                .header("api-key", INVENTORY_API_KEY)
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(ProductDto.class)
                 .block();
     }
 
-    public String getUser(String userId) {
-        // Call user service to get user name based on userId
+    private UserDto getUserFromService(String userId) {
         return webClient.get()
                 .uri(USER_URL + userId)
+                .header("api-key", USER_API_KEY)
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(UserDto.class)
                 .block();
-    }
-
-    private RemainingOrderDto convertToRemainingOrderDto(Order order) {
-        // Fetch user and product names
-        String userName = getUser(order.getUser());
-        String productName = getProduct(order.getProduct());
-
-        // Create RemainingOrderDto
-        return RemainingOrderDto.builder()
-                .id(order.getId())
-                .date(order.getDate())
-                .customer(userName)
-                .items(List.of(new RemainingOrderDto.Item(productName, order.getQuantity())))
-                .isPacked(order.isPacked())
-                .build();
-    }
-
-    public void getProduct(){
-
-    }
-
-    public void getUser(){
-
     }
 }
 

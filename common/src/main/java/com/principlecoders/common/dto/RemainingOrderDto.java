@@ -3,6 +3,7 @@ package com.principlecoders.common.dto;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -13,15 +14,7 @@ import java.util.Date;
 public class RemainingOrderDto {
     private String id;
     private Date date;
-    private String userId;
-    private item[] items;
+    private String customer;
+    private List<ItemQuantity> items;
     private boolean isPacked;
-
-
-}
-
-class item{
-
-    private String productId;
-    private int quantity;
 }
