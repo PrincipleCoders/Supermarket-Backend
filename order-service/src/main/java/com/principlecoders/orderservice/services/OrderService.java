@@ -79,14 +79,14 @@ public class OrderService {
         }
     }
 
-    public ResponseEntity<?> deleteCartItem(String cartId, String productId) {
-        Optional<Cart> cart = cartRepository.findById(cartId);
-        if (cart.isPresent()) {
-            Map<String, Integer> productsQuantity = cart.get().getProductsQuantity();
+    public ResponseEntity<?> deleteCartItem(String userId, String productId) {
+        Cart cart = cartRepository.findByUserId(userId);
+        if (cart.getId()!=null) {
+            Map<String, Integer> productsQuantity = cart.getProductsQuantity();
             if (productsQuantity.containsKey(productId)) {
                 productsQuantity.remove(productId);
-                cart.get().setProductsQuantity(productsQuantity);
-                cartRepository.save(cart.get());
+                cart.setProductsQuantity(productsQuantity);
+                cartRepository.save(cart);
                 return ResponseEntity.ok("Item deleted from the cart");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found in the cart");

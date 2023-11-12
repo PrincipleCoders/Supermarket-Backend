@@ -21,9 +21,9 @@ public class OrderController {
         return orderService.addToCart(cartItemDto);
     }
 
-    @DeleteMapping("cart/{cartId}/product/{productId}")
-    public ResponseEntity<?> deleteProduct(@PathVariable String cartId, @PathVariable String productId){
-        return orderService.deleteCartItem(cartId,productId);
+    @DeleteMapping("cart/user/{userId}/product/{productId}")
+    public ResponseEntity<?> deleteProduct(@PathVariable String userId, @PathVariable String productId){
+        return orderService.deleteCartItem(userId,productId);
     }
 
     @GetMapping("order/user/{userId}")
