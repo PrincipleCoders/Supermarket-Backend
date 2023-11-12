@@ -1,4 +1,4 @@
-package com.principlecoders.orderservice.models;
+package com.principlecoders.common.dto;
 
 import lombok.*;
 
@@ -10,11 +10,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Order {
+
+public class RemainingOrderDto {
     private String id;
-    private String userId;
-    private String status;
     private Date date;
+    private String customer;
+    private List<ItemQuantity> items;
     private boolean isPacked;
-    private List<OrderProduct> orderProducts;
 }

@@ -16,11 +16,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 
+import static com.principlecoders.common.utils.ServiceApiKeys.INVENTORY_API_KEY;
+import static com.principlecoders.common.utils.ServiceApiKeys.USER_API_KEY;
 import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
+import static com.principlecoders.common.utils.ServiceUrls.USER_URL;
 
 @Service
 @RequiredArgsConstructor
-
 public class OrderService {
     private final CartRepository cartRepository;
     private final WebClient webClient;
@@ -36,6 +38,7 @@ public class OrderService {
         cart.getProductsQuantity().forEach((productId, quantity) -> {
             ProductDto productDto = webClient.get()
                     .uri(INVENTORY_URL + "product/" + productId)
+                    .header("api-key", INVENTORY_API_KEY)
                     .retrieve()
                     .bodyToMono(ProductDto.class)
                     .block();
@@ -123,9 +126,63 @@ public class OrderService {
         return ResponseEntity.ok(orderDetailsDtos);
     }
 
+    public ResponseEntity<?> getRemainingOrders() {
+        List<Order> remainingOrders = orderRepository.findAllByPackedIsFalse();
+
+        if (remainingOrders.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        else {
+            List<RemainingOrderDto> remainingOrderDtos = new ArrayList<>();
+            remainingOrders.forEach(order -> {
+                String customer = getUserFromService(order.getUserId()).getName();
+                List<ItemQuantity> items = new ArrayList<>();
+
+                order.getOrderProducts().forEach(orderProduct -> {
+                    String productName = getProductFromService(orderProduct.getProductId()).getName();
+                    items.add(ItemQuantity.builder()
+                            .item(productName)
+                            .quantity(orderProduct.getQuantity())
+                            .build());
+                });
+
+                remainingOrderDtos.add(RemainingOrderDto.builder()
+                        .id(order.getId())
+                        .date(order.getDate())
+                        .customer(customer)
+                        .items(items)
+                        .isPacked(order.isPacked())
+                        .build());
+            });
+            return ResponseEntity.ok(remainingOrderDtos);
+        }
+    }
 
 
 
 
 
+
+    private ProductDto getProductFromService(String productId) {
+        return webClient.get()
+                .uri(INVENTORY_URL + "product/" + productId)
+                .header("api-key", INVENTORY_API_KEY)
+                .retrieve()
+                .bodyToMono(ProductDto.class)
+                .block();
+    }
+
+    private UserDto getUserFromService(String userId) {
+        return webClient.get()
+                .uri(USER_URL + userId)
+                .header("api-key", USER_API_KEY)
+                .retrieve()
+                .bodyToMono(UserDto.class)
+                .block();
+    }
 }
+
+
+
+
+

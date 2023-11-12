@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends MongoRepository<Order, String> {
-    List<Order> findByUserId(String userId);
+    List<Order> findAllByPackedIsFalse();
 }
