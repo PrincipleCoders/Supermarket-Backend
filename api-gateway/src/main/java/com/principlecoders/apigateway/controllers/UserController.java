@@ -1,10 +1,9 @@
 package com.principlecoders.apigateway.controllers;
 
+import com.principlecoders.common.dto.AdditionalDataDto;
 import com.principlecoders.common.helpers.WebClientErrorHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -29,5 +28,16 @@ public class UserController {
                 .onErrorResume(webClientErrorHandler::handle);
     }
 
+    @PutMapping("/additionalData")
+    public Mono<?> updateAdditionalData(@RequestBody AdditionalDataDto additionalData) {
+        String userUrl = USER_URL + "user/all";
 
+        return webClient.put()
+                .uri(userUrl)
+                .header("api-key", USER_API_KEY)
+                .body(Mono.just(additionalData), AdditionalDataDto.class)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }

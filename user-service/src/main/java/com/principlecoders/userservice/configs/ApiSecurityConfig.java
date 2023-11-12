@@ -14,7 +14,7 @@ public class ApiSecurityConfig {
     public FilterRegistrationBean<ApiSecretFilter> apiSecretFilter() {
         FilterRegistrationBean<ApiSecretFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new ApiSecretFilter(USER_API_KEY));
-        registrationBean.addUrlPatterns("user/*");
+        registrationBean.addUrlPatterns("user/*","auth/*");
         return registrationBean;
     }
 }
