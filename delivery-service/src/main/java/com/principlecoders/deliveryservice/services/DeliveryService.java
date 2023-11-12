@@ -1,5 +1,6 @@
 package com.principlecoders.deliveryservice.services;
 
+import com.principlecoders.common.dto.DeliveryDto;
 import com.principlecoders.deliveryservice.models.Delivery;
 import com.principlecoders.deliveryservice.repositories.DeliveryRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +27,32 @@ public class DeliveryService {
         }
     }
 
-    public Delivery updateDelivered(String deliveryId, Boolean isDelivered) {
+    public ResponseEntity<?> updateDelivered(String deliveryId, boolean isDelivered) {
         Optional<Delivery> optionalDelivery = deliveryRepository.findById(deliveryId);
 
         if (optionalDelivery.isPresent()) {
             Delivery delivery = optionalDelivery.get();
-            delivery.setIsDelivered(isDelivered);
-            return deliveryRepository.save(delivery);
-        } else {
-            return null; // Delivery not found
+            delivery.setDelivered(isDelivered);
+            return ResponseEntity.ok(deliveryRepository.save(delivery));
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
     }
 
-    public Delivery createDelivery(Delivery newDelivery) {
-        return deliveryRepository.save(newDelivery);
+    public ResponseEntity<?> createDelivery(DeliveryDto deliveryDto) {
+        Delivery newDelivery = deliveryRepository.save(Delivery.builder()
+                .orderId(deliveryDto.getOrderId())
+                .markToDeliver(deliveryDto.isMarkToDeliver())
+                .isDelivered(deliveryDto.isDelivered())
+                .delivererId(deliveryDto.getDelivererId())
+                .build());
+
+        if (newDelivery.getId() != null) {
+            return ResponseEntity.ok(newDelivery);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
