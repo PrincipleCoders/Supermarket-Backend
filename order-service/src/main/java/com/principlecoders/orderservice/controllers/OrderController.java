@@ -20,13 +20,9 @@ public class OrderController {
     public ResponseEntity<?> addToCart(@RequestBody CartItemDto cartItemDto) {
         return orderService.addToCart(cartItemDto);
     }
-    @DeleteMapping("cart/user/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable String userId) {
-        return orderService.deleteCart(userId);
-    }
 
-    @DeleteMapping("product/{productId}")
-    public ResponseEntity<?> deleteProduct(@PathVariable String productId){
-        return orderService.deleteCart(productId);
+    @DeleteMapping("cart/{cartId}/product/{productId}")
+    public ResponseEntity<?> deleteProduct(@PathVariable String cartId, @PathVariable String productId){
+        return orderService.deleteCartItem(cartId,productId);
     }
 }

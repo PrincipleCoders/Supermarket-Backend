@@ -11,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
 
@@ -62,14 +59,12 @@ public class OrderService {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(newCart);
-        }
-        else {
+        } else {
             Map<String, Integer> productsQuantity = cart.getProductsQuantity();
             if (productsQuantity.containsKey(cartItemDto.getProductId())) {
                 productsQuantity.put(cartItemDto.getProductId(),
                         productsQuantity.get(cartItemDto.getProductId()) + cartItemDto.getQuantity());
-            }
-            else {
+            } else {
                 productsQuantity.put(cartItemDto.getProductId(), cartItemDto.getQuantity());
             }
             cart.setProductsQuantity(productsQuantity);
@@ -78,33 +73,21 @@ public class OrderService {
         }
     }
 
-    public ResponseEntity<?> deleteCart(String cartItemDto){
-        Cart cart = cartRepository.findByUserId(cartItemDto.getUserId());
-        if(cart!=null){
-            // Modify the cart in-memory
-            List<CartProductsDto> cartItems = cart.getCartItems();
-
-            // Find the item in the list
-            CartItemDto itemToRemove = cartItems.stream()
-                    .filter(item -> item.getItemId().equals(cartItemDto.getItemId()))
-                    .findFirst()
-                    .orElse(null);
-
-            if (itemToRemove != null) {
-                // Remove the item from the list
-                cartItems.remove(itemToRemove);
-
-                // Save the updated cart back to MongoDB
-                cartRepository.save(cart);
-
+    public ResponseEntity<?> deleteCartItem(String cartId, String productId) {
+        Optional<Cart> cart = cartRepository.findById(cartId);
+        if (cart.isPresent()) {
+            Map<String, Integer> productsQuantity = cart.get().getProductsQuantity();
+            if (productsQuantity.containsKey(productId)) {
+                productsQuantity.remove(productId);
+                cart.get().setProductsQuantity(productsQuantity);
+                cartRepository.save(cart.get());
                 return ResponseEntity.ok("Item deleted from the cart");
             } else {
-                // If the item is not found in the cart
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found in the cart");
             }
         } else {
-            // If the cart is not found for the given userId
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart not found for the user");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("cart not found");
         }
     }
 }
