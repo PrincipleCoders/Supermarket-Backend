@@ -5,23 +5,14 @@ import com.principlecoders.inventoryservice.models.Product;
 import com.principlecoders.inventoryservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class InventoryService {
     private final ProductRepository productRepository;
-
-//    public ResponseEntity<?> getCartItemsOfUser(List<String> productIds) {
-//        if (productRepository.findAllById(productIds).isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        return ResponseEntity.ok(productRepository.findAllById(productIds));
-//    }
 
     public ResponseEntity<?> getProductById(String productId) {
         if (productRepository.findById(productId).isEmpty()) {
@@ -41,8 +32,12 @@ public class InventoryService {
                 .supplier(productDto.getSupplier())
                 .category(productDto.getCategory())
                 .build();
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(productRepository.save(product));
+
+        Product newProduct = productRepository.save(product);
+        if (newProduct.getId() != null) {
+            return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

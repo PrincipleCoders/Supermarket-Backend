@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("inventory")
 public class InventoryController {
     private final InventoryService inventoryService;
 
