@@ -40,4 +40,9 @@ public class OrderController {
     public ResponseEntity<?> updateOrderStatus(@PathVariable String orderId, @RequestBody boolean isPacked) {
         return orderService.updateOrderStatus(orderId, isPacked);
     }
+
+    @GetMapping("user/all")
+    public ResponseEntity<?> getAllOrdersOfUsers() {
+        return orderService.getAllOrdersOfUsers();
+    }
 }

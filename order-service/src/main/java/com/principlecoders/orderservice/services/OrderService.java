@@ -90,61 +90,24 @@ public class OrderService {
         }
     }
 
-    
+
+    public ResponseEntity<?> getRemainingOrders() {
+        List<Order> remainingOrders = orderRepository.findAllByPackedIsFalse();
+        if (remainingOrders.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        else {
+            return ResponseEntity.ok(getOrderDetailDtos(remainingOrders));
+        }
+    }
+
     public ResponseEntity<?> getOrderDetailsOfUser(String userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
         if (orders.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-
-        List<OrderDetailsDto> orderDetailsDtos = new ArrayList<>();
-        orders.forEach(order -> {
-            int total = order.getOrderProducts().stream()
-                    .mapToInt(orderProduct -> orderProduct.getPrice() * orderProduct.getQuantity())
-                    .sum();
-
-            OrderDetailsDto orderDetailsDto = OrderDetailsDto.builder()
-                    .id(order.getId())
-                    .date(order.getDate())
-                    .status(order.getStatus())
-                    .items(order.getOrderProducts().size())
-                    .total(total)
-                    .build();
-
-            orderDetailsDtos.add(orderDetailsDto);
-        });
-        return ResponseEntity.ok(orderDetailsDtos);
-    }
-
-    public ResponseEntity<?> getRemainingOrders() {
-        List<Order> remainingOrders = orderRepository.findAllByPackedIsFalse();
-
-        if (remainingOrders.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
         else {
-            List<RemainingOrderDto> remainingOrderDtos = new ArrayList<>();
-            remainingOrders.forEach(order -> {
-                String customer = getUserFromService(order.getUserId()).getName();
-                List<ItemQuantity> items = new ArrayList<>();
-
-                order.getOrderProducts().forEach(orderProduct -> {
-                    String productName = getProductFromService(orderProduct.getProductId()).getName();
-                    items.add(ItemQuantity.builder()
-                            .item(productName)
-                            .quantity(orderProduct.getQuantity())
-                            .build());
-                });
-
-                remainingOrderDtos.add(RemainingOrderDto.builder()
-                        .id(order.getId())
-                        .date(order.getDate())
-                        .customer(customer)
-                        .items(items)
-                        .isPacked(order.isPacked())
-                        .build());
-            });
-            return ResponseEntity.ok(remainingOrderDtos);
+            return ResponseEntity.ok(getOrderDetailDtos(orders));
         }
     }
 
@@ -166,8 +129,53 @@ public class OrderService {
         }
     }
 
+    public ResponseEntity<?> getAllOrdersOfUsers() {
+        List<Order> orders = orderRepository.findAll();
+        if (orders.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        List<CustomerOrder> customerOrders = new ArrayList<>();
+        orders.forEach(order -> {
+            OrderDetailsDto orderDetailsDto = getOrderDetailDtos(orders).get(0);
+            UserDto userDto = getUserFromService(order.getUserId());
+
+            customerOrders.add(CustomerOrder.builder()
+                    .id(order.getId())
+                    .date(order.getDate())
+                    .status(order.getStatus())
+                    .total(orderDetailsDto.getTotal())
+                    .items(orderDetailsDto.getItems())
+                    .customer(userDto.getName())
+                    .address(userDto.getAddress())
+                    .telephone(userDto.getTelephone())
+                    .build());
+        });
+        return ResponseEntity.ok(customerOrders);
+    }
 
 
+
+
+    private List<OrderDetailsDto> getOrderDetailDtos(List<Order> orders) {
+        List<OrderDetailsDto> orderDetailsDtos = new ArrayList<>();
+        orders.forEach(order -> {
+            int total = order.getOrderProducts().stream()
+                    .mapToInt(orderProduct -> orderProduct.getPrice() * orderProduct.getQuantity())
+                    .sum();
+
+            OrderDetailsDto orderDetailsDto = OrderDetailsDto.builder()
+                    .id(order.getId())
+                    .date(order.getDate())
+                    .status(order.getStatus())
+                    .items(order.getOrderProducts().size())
+                    .total(total)
+                    .build();
+
+            orderDetailsDtos.add(orderDetailsDto);
+        });
+        return orderDetailsDtos;
+    }
 
     private ProductDto getProductFromService(String productId) {
         return webClient.get()
