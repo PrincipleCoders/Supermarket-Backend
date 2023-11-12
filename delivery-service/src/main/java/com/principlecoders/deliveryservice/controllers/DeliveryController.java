@@ -27,4 +27,9 @@ public class DeliveryController {
     public ResponseEntity<?> createDelivery(@RequestBody DeliveryDto deliveryDto) {
         return deliveryService.createDelivery(deliveryDto);
     }
+
+    @GetMapping("order/readyToDeliver/all")
+    public ResponseEntity<?> getAllReadyToDeliverOrders() {
+        return deliveryService.getAllReadyToDeliverOrders();
+    }
 }

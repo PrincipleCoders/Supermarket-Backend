@@ -136,12 +136,12 @@ public class OrderService {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-        List<CustomerOrder> customerOrders = new ArrayList<>();
+        List<CustomerOrderDto> customerOrderDtos = new ArrayList<>();
         orders.forEach(order -> {
             OrderDetailsDto orderDetailsDto = getOrderDetailDtos(orders).get(0);
             UserDto userDto = getUserFromService(order.getUserId());
 
-            customerOrders.add(CustomerOrder.builder()
+            customerOrderDtos.add(CustomerOrderDto.builder()
                     .id(order.getId())
                     .date(order.getDate())
                     .status(order.getStatus())
@@ -152,7 +152,7 @@ public class OrderService {
                     .telephone(userDto.getTelephone())
                     .build());
         });
-        return ResponseEntity.ok(customerOrders);
+        return ResponseEntity.ok(customerOrderDtos);
     }
 
 
