@@ -25,4 +25,11 @@ public class OrderController {
     public ResponseEntity<?> deleteProduct(@PathVariable String cartId, @PathVariable String productId){
         return orderService.deleteCartItem(cartId,productId);
     }
+
+    @GetMapping("order/user/{userId}")
+    public ResponseEntity<?> getOrderDetailsOfUser(@PathVariable String userId) {
+        return orderService.getOrderDetailsOfUser(userId);
+    }
+
+
 }
