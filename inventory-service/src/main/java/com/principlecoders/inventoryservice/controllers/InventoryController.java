@@ -26,4 +26,9 @@ public class InventoryController {
     public ResponseEntity<?> getAllProducts() {
         return inventoryService.getAllProducts();
     }
+
+    @PutMapping("product/{productId}/quantity")
+    public ResponseEntity<?> updateProductQuantity(@PathVariable String productId, @RequestBody int quantity) {
+        return inventoryService.updateProductQuantity(productId, quantity);
+    }
 }

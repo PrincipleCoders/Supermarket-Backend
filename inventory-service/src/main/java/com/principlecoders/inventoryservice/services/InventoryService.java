@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +50,14 @@ public class InventoryService {
         } else {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public ResponseEntity<?> updateProductQuantity(String productId, int quantity) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        product.get().setQuantity(quantity);
+        return ResponseEntity.ok(productRepository.save(product.get()));
     }
 }
