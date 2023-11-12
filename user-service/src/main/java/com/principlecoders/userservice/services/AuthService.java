@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import com.principlecoders.common.dto.ResponseMessage;
+import com.principlecoders.common.dto.UserDto;
 import com.principlecoders.common.utils.UserRoles;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,34 +20,40 @@ public class AuthService {
     private final FirebaseAuth firebaseAuth;
     public ResponseEntity<?> validateLogin(String accessToken) {
         try {
-            FirebaseToken decodedToken = firebaseAuth.verifyIdToken(accessToken);
+            String token = accessToken.split(" ")[1].trim();
+            FirebaseToken decodedToken = firebaseAuth.verifyIdToken(token);
             String uid = decodedToken.getUid();
             UserRecord userRecord = firebaseAuth.getUser(uid);
-            Object userRoles = userRecord.getCustomClaims().get("role");
-            if (userRoles == null) {
-                userRoles = setUserRole(uid, UserRoles.CUSTOMER).getHeaders().get("Role");
+
+            String userRole = (String) userRecord.getCustomClaims().get("role");
+            if (userRole == null) {
+                userRole = setUserRole(uid, UserRoles.CUSTOMER).getHeaders().get("Role").get(0);
             }
+
             boolean emailVerified = userRecord.isEmailVerified();
-            if (!emailVerified){
-                firebaseAuth.generateEmailVerificationLink(userRecord.getEmail());
-            }
+//            if (!emailVerified){
+//                firebaseAuth.generateEmailVerificationLink(userRecord.getEmail());
+//            }
+
             String newToken = firebaseAuth.createCustomToken(uid);
 
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .header("Authorization", "Bearer "+newToken)
-                    .body(
-                            new Object() {
-                                final Object user = userRecord;
-                                final boolean isEmailVerified = emailVerified;
-                            }
+                    .body(UserDto.builder()
+                            .id(uid)
+                            .email(userRecord.getEmail())
+                            .name(userRecord.getDisplayName())
+                            .role(UserRoles.valueOf(userRole))
+                            .build()
                     );
         }
         catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(
                             ResponseMessage.builder()
                                     .message("Login failed")
-                                    .error(e.getMessage())
+                                    .error(e.getLocalizedMessage())
                                     .build()
                     );
         }
@@ -55,7 +62,7 @@ public class AuthService {
     public ResponseEntity<?> setUserRole(String uid, UserRoles role) {
         try {
             Map<String, Object> claims = new HashMap<>();
-            claims.put("Role", role);
+            claims.put("Role", String.valueOf(role));
             firebaseAuth.setCustomUserClaims(uid, claims);
 
             return ResponseEntity.status(HttpStatus.ACCEPTED)
