@@ -26,6 +26,7 @@ public class AuthService {
             UserRecord userRecord = firebaseAuth.getUser(uid);
 
             String userRole = (String) userRecord.getCustomClaims().get("role");
+            System.out.println(userRole);
             if (userRole == null) {
                 userRole = setUserRole(uid, UserRoles.CUSTOMER).getHeaders().get("Role").get(0);
             }

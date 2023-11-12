@@ -24,6 +24,7 @@ public class GatewaySecurityConfig {
                             corsConfig.addAllowedOrigin("*");
                             corsConfig.addAllowedHeader("*");
                             corsConfig.addAllowedMethod("*");
+                            corsConfig.addExposedHeader("Authorization");
                             return corsConfig;
                         })
                 )
