@@ -19,11 +19,12 @@ public class AuthController {
 
     @GetMapping("login")
     public Mono<?> validateLogin(@RequestHeader("Authorization") String accessToken) {
-        String userUrl = USER_URL + "auth/login/" + accessToken;
+        String userUrl = USER_URL + "auth/login";
 
         return webClient.get()
                 .uri(userUrl)
                 .header("api-key", USER_API_KEY)
+                .header("Authorization", accessToken)
                 .retrieve()
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);

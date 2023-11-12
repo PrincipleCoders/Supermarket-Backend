@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("user/")
 public class AuthController {
     private final AuthService authService;
 
-    @GetMapping("/login/{accessToken}")
-    public ResponseEntity<?> validateLogin(@PathVariable String accessToken) {
+    @GetMapping("auth/login")
+    public ResponseEntity<?> validateLogin(@RequestHeader("Authorization") String accessToken) {
         return authService.validateLogin(accessToken);
     }
 
-    @PostMapping("/setUserRole")
+    @PostMapping("auth/setUserRole")
     public ResponseEntity<?> setUserRole(@RequestBody UserRoleDto userRole) {
         return authService.setUserRole(userRole.getUserId(), userRole.getRole());
     }
