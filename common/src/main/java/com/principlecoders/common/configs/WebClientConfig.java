@@ -10,7 +10,6 @@ public class WebClientConfig {
     public WebClient initWebClient() {
         return WebClient.builder()
                 .defaultHeader("Content-Type", "application/json")
-                .defaultHeader("Accept", "application/json")
                 .filter((request, next) -> {
                     System.out.println("Request: " + request.method() + " " + request.url() + " " + request.headers());
                     return next.exchange(request);
