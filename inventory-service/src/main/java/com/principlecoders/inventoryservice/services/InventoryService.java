@@ -16,19 +16,14 @@ import java.util.List;
 public class InventoryService {
     private final ProductRepository productRepository;
 
-//    public ResponseEntity<?> getCartItemsOfUser(List<String> productIds) {
-//        if (productRepository.findAllById(productIds).isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        return ResponseEntity.ok(productRepository.findAllById(productIds));
-//    }
-public ResponseEntity<?> getAllProducts() {
-    List<Product> products = productRepository.findAll();
-    if (products.isEmpty()) {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        if (products.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(products);
     }
-    return ResponseEntity.ok(products);
-}
+
     public ResponseEntity<?> getProductById(String productId) {
         if (productRepository.findById(productId).isEmpty()) {
             return ResponseEntity.notFound().build();
