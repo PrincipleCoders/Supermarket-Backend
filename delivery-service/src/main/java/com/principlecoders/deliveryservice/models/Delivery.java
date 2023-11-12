@@ -1,19 +1,16 @@
 package com.principlecoders.deliveryservice.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.*;
 
-
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
-@Document(value = "deliveries")
-
 public class Delivery {
-    @Id
     private String id;
-    private Boolean markToDeliver;
-    private Boolean isDelivered;
+    private String orderId;
+    private boolean markToDeliver;
+    private boolean isDelivered;
+    private String delivererId;
 }
