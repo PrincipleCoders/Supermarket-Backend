@@ -18,6 +18,15 @@ public class GatewaySecurityConfig {
                 .csrf().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
+                .cors(cors-> cors
+                        .configurationSource(request -> {
+                            var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+                            corsConfig.addAllowedOrigin("*");
+                            corsConfig.addAllowedHeader("*");
+                            corsConfig.addAllowedMethod("*");
+                            return corsConfig;
+                        })
+                )
                 .authorizeHttpRequests((authorize) -> authorize
                         .anyRequest().permitAll()
                 );

@@ -38,6 +38,7 @@ public class SecurityChainFilter extends OncePerRequestFilter {
             // Allow the request to pass through
             if (token.startsWith("AccessToken ")) {
                 chain.doFilter(request, response);
+                return;
             }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
