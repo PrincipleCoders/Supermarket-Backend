@@ -1,7 +1,6 @@
 package com.principlecoders.orderservice.controllers;
 
 import com.principlecoders.common.dto.CartItemDto;
-import com.principlecoders.common.dto.RemainingOrderDto;
 import com.principlecoders.orderservice.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,14 +26,18 @@ public class OrderController {
         return orderService.deleteCartItem(userId, productId);
     }
 
-    @GetMapping("order/user/{userId}")
+    @GetMapping("user/{userId}")
     public ResponseEntity<?> getOrderDetailsOfUser(@PathVariable String userId) {
         return orderService.getOrderDetailsOfUser(userId);
     }
 
-    @GetMapping("orders/remaining")
+    @GetMapping("remaining")
     public ResponseEntity<?> getRemainingOrders() {
         return orderService.getRemainingOrders();
     }
 
+    @PutMapping("status/{orderId}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable String orderId, @RequestBody boolean isPacked) {
+        return orderService.updateOrderStatus(orderId, isPacked);
+    }
 }

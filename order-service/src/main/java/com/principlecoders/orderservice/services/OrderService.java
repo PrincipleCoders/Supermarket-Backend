@@ -13,10 +13,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 
-import static com.principlecoders.common.utils.ServiceApiKeys.INVENTORY_API_KEY;
-import static com.principlecoders.common.utils.ServiceApiKeys.USER_API_KEY;
-import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
-import static com.principlecoders.common.utils.ServiceUrls.USER_URL;
+import static com.principlecoders.common.utils.ServiceApiKeys.*;
+import static com.principlecoders.common.utils.ServiceUrls.*;
 
 @Service
 @RequiredArgsConstructor
@@ -175,6 +173,42 @@ public class OrderService {
                 .header("api-key", USER_API_KEY)
                 .retrieve()
                 .bodyToMono(UserDto.class)
+                .block();
+    }
+
+    public ResponseEntity<?> updateOrderStatus(String orderId, boolean isPacked) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        order.setPacked(isPacked);
+        Order newOrder = orderRepository.save(order);
+
+        if (isPacked) {
+            DeliveryDto deliveryDto = makeDeliveryRecordFromService(orderId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(newOrder+" "+deliveryDto);
+        } else {
+            boolean isDeleted = deleteDeliveryRecordFromService(orderId);
+            return ResponseEntity.status(HttpStatus.OK).body(isDeleted);
+        }
+    }
+
+    private DeliveryDto makeDeliveryRecordFromService(String orderId) {
+        return webClient.post()
+                .uri(DELIVERY_URL + "order/" + orderId)
+                .header("api-key", DELIVERY_API_KEY)
+                .retrieve()
+                .bodyToMono(DeliveryDto.class)
+                .block();
+    }
+
+    private Boolean deleteDeliveryRecordFromService(String orderId) {
+        return webClient.delete()
+                .uri(DELIVERY_URL + "order/" + orderId)
+                .header("api-key", DELIVERY_API_KEY)
+                .retrieve()
+                .bodyToMono(Boolean.class)
                 .block();
     }
 }
