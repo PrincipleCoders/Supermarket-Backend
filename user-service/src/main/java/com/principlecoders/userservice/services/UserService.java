@@ -77,6 +77,16 @@ public class UserService {
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
+    }
 
+    public ResponseEntity<?> getUserById(String userId) {
+        if (userId.equals("1")) {
+            return ResponseEntity.ok(UserDto.builder()
+                    .id("1")
+                    .name("John Doe")
+                    .build());
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
     }
 }

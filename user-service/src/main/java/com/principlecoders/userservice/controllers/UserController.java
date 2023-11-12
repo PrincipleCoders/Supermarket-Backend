@@ -8,17 +8,22 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("user")
+@RequestMapping("user/")
 public class UserController {
     private final UserService userService;
 
-    @PutMapping("/additionalData")
+    @PutMapping("additionalData")
     public ResponseEntity<?> updateAdditionalData(@RequestBody AdditionalDataDto additionalData) {
         return userService.updateAdditionalData(additionalData);
     }
 
-    @GetMapping("/all")
+    @GetMapping("all")
     public ResponseEntity<?> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+    @GetMapping("{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable String userId) {
+        return userService.getUserById(userId);
     }
 }
