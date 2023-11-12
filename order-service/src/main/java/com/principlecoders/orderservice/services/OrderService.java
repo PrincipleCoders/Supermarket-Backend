@@ -3,6 +3,7 @@ package com.principlecoders.orderservice.services;
 import com.principlecoders.common.dto.*;
 import com.principlecoders.orderservice.models.Cart;
 import com.principlecoders.orderservice.models.Order;
+import com.principlecoders.orderservice.models.OrderProduct;
 import com.principlecoders.orderservice.repositories.CartRepository;
 import com.principlecoders.orderservice.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,8 @@ public class OrderService {
 
     public ResponseEntity<?> getCartItemsOfUser(String userId) {
         Cart cart = cartRepository.findByUserId(userId);
-        if (cart == null) {
-            return ResponseEntity.notFound().build();
+        if (cart == null || cart.getProductsQuantity().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
         List<CartProductsDto> cartProductsDtos = new ArrayList<>();
@@ -45,7 +46,7 @@ public class OrderService {
 
 
 
-    public ResponseEntity<?> addToCart(CartItemDto cartItemDto) {
+    public ResponseEntity<?> addOrUpdateCart(CartItemDto cartItemDto) {
         Cart cart = cartRepository.findByUserId(cartItemDto.getUserId());
         if (cart == null) {
             Map<String, Integer> productsQuantity = new HashMap<>();
@@ -61,9 +62,9 @@ public class OrderService {
         } else {
             Map<String, Integer> productsQuantity = cart.getProductsQuantity();
             if (productsQuantity.containsKey(cartItemDto.getProductId())) {
-                productsQuantity.put(cartItemDto.getProductId(),
-                        productsQuantity.get(cartItemDto.getProductId()) + cartItemDto.getQuantity());
-            } else {
+                productsQuantity.replace(cartItemDto.getProductId(), cartItemDto.getQuantity());
+            }
+            else {
                 productsQuantity.put(cartItemDto.getProductId(), cartItemDto.getQuantity());
             }
             cart.setProductsQuantity(productsQuantity);
@@ -211,6 +212,38 @@ public class OrderService {
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .block();
+    }
+
+    public ResponseEntity<?> checkout(String userId) {
+        Cart cart = cartRepository.findByUserId(userId);
+        if (cart == null || cart.getProductsQuantity().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        List<OrderProduct> orderProducts = new ArrayList<>();
+        cart.getProductsQuantity().forEach((productId, quantity) -> {
+            ProductDto productDto = getProductFromService(productId);
+            orderProducts.add(OrderProduct.builder()
+                    .productId(productId)
+                    .quantity(quantity)
+                    .price(productDto.getPrice())
+                    .build());
+        });
+
+        Order newOrder = orderRepository.save(Order.builder()
+                .userId(userId)
+                .orderProducts(orderProducts)
+                .date(new Date())
+                .status("processing")
+                .isPacked(false)
+                .build());
+
+        if (newOrder.getId() != null) {
+            cartRepository.delete(cart);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newOrder);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
 

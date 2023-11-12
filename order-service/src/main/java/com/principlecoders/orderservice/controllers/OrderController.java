@@ -18,7 +18,7 @@ public class OrderController {
 
     @PostMapping("cart")
     public ResponseEntity<?> addToCart(@RequestBody CartItemDto cartItemDto) {
-        return orderService.addToCart(cartItemDto);
+        return orderService.addOrUpdateCart(cartItemDto);
     }
 
     @DeleteMapping("cart/user/{userId}/product/{productId}")
@@ -44,5 +44,10 @@ public class OrderController {
     @GetMapping("user/all")
     public ResponseEntity<?> getAllOrdersOfUsers() {
         return orderService.getAllOrdersOfUsers();
+    }
+
+    @PostMapping("checkout")
+    public ResponseEntity<?> checkout(@RequestBody String userId) {
+        return orderService.checkout(userId);
     }
 }
