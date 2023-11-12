@@ -20,4 +20,9 @@ public class OrderController {
     public ResponseEntity<?> addToCart(@RequestBody CartItemDto cartItemDto) {
         return orderService.addToCart(cartItemDto);
     }
+
+    @DeleteMapping("cart/{cartId}/product/{productId}")
+    public ResponseEntity<?> deleteProduct(@PathVariable String cartId, @PathVariable String productId){
+        return orderService.deleteCartItem(cartId,productId);
+    }
 }

@@ -11,15 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.principlecoders.common.utils.ServiceUrls.INVENTORY_URL;
 
 @Service
 @RequiredArgsConstructor
+
 public class OrderService {
     private final CartRepository cartRepository;
     private final WebClient webClient;
@@ -61,19 +59,35 @@ public class OrderService {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(newCart);
-        }
-        else {
+        } else {
             Map<String, Integer> productsQuantity = cart.getProductsQuantity();
             if (productsQuantity.containsKey(cartItemDto.getProductId())) {
                 productsQuantity.put(cartItemDto.getProductId(),
                         productsQuantity.get(cartItemDto.getProductId()) + cartItemDto.getQuantity());
-            }
-            else {
+            } else {
                 productsQuantity.put(cartItemDto.getProductId(), cartItemDto.getQuantity());
             }
             cart.setProductsQuantity(productsQuantity);
             Cart updatedCart = cartRepository.save(cart);
             return ResponseEntity.ok(updatedCart);
+        }
+    }
+
+    public ResponseEntity<?> deleteCartItem(String cartId, String productId) {
+        Optional<Cart> cart = cartRepository.findById(cartId);
+        if (cart.isPresent()) {
+            Map<String, Integer> productsQuantity = cart.get().getProductsQuantity();
+            if (productsQuantity.containsKey(productId)) {
+                productsQuantity.remove(productId);
+                cart.get().setProductsQuantity(productsQuantity);
+                cartRepository.save(cart.get());
+                return ResponseEntity.ok("Item deleted from the cart");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found in the cart");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("cart not found");
         }
     }
 }
