@@ -31,12 +31,7 @@ public class OrderService {
 
         List<CartProductsDto> cartProductsDtos = new ArrayList<>();
         cart.getProductsQuantity().forEach((productId, quantity) -> {
-            ProductDto productDto = webClient.get()
-                    .uri(INVENTORY_URL + "product/" + productId)
-                    .header("api-key", INVENTORY_API_KEY)
-                    .retrieve()
-                    .bodyToMono(ProductDto.class)
-                    .block();
+            ProductDto productDto = getProductFromService(productId);
             cartProductsDtos.add(CartProductsDto.builder()
                     .price(productDto.getPrice())
                     .productId(productId)
@@ -153,7 +148,23 @@ public class OrderService {
         }
     }
 
+    public ResponseEntity<?> updateOrderStatus(String orderId, boolean isPacked) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        order.setPacked(isPacked);
+        Order newOrder = orderRepository.save(order);
 
+        if (isPacked) {
+            DeliveryDto deliveryDto = makeDeliveryRecordFromService(orderId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(newOrder+" "+deliveryDto);
+        } else {
+            boolean isDeleted = deleteDeliveryRecordFromService(orderId);
+            return ResponseEntity.status(HttpStatus.OK).body(isDeleted);
+        }
+    }
 
 
 
@@ -174,24 +185,6 @@ public class OrderService {
                 .retrieve()
                 .bodyToMono(UserDto.class)
                 .block();
-    }
-
-    public ResponseEntity<?> updateOrderStatus(String orderId, boolean isPacked) {
-        Order order = orderRepository.findById(orderId).orElse(null);
-        if (order == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
-        order.setPacked(isPacked);
-        Order newOrder = orderRepository.save(order);
-
-        if (isPacked) {
-            DeliveryDto deliveryDto = makeDeliveryRecordFromService(orderId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(newOrder+" "+deliveryDto);
-        } else {
-            boolean isDeleted = deleteDeliveryRecordFromService(orderId);
-            return ResponseEntity.status(HttpStatus.OK).body(isDeleted);
-        }
     }
 
     private DeliveryDto makeDeliveryRecordFromService(String orderId) {
