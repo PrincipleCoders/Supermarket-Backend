@@ -1,19 +1,18 @@
-package com.principlecoders.orderservice.models;
+package com.principlecoders.common.dto;
 
 import lombok.*;
 
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Order {
+public class OrderDetailsDto {
     private String id;
-    private String userId;
-    private List<OrderProduct> orderProducts;
     private Date date;
     private String status;
+    private int total;
+    private int items;
 }

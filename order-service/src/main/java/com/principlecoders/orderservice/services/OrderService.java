@@ -3,7 +3,7 @@ package com.principlecoders.orderservice.services;
 import com.principlecoders.common.dto.CartItemDto;
 import com.principlecoders.common.dto.CartProductsDto;
 import com.principlecoders.common.dto.ProductDto;
-import com.principlecoders.common.dto.OrderProductDto;
+import com.principlecoders.common.dto.OrderDetailsDto;
 import com.principlecoders.orderservice.models.Cart;
 import com.principlecoders.orderservice.models.Order;
 import com.principlecoders.orderservice.repositories.CartRepository;
@@ -83,33 +83,29 @@ public class OrderService {
         }
     }
 
-    public ResponseEntity<?> getOrderItemsOfUser(String userId) {
+    public ResponseEntity<?> getOrderDetailsOfUser(String userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
         if (orders.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-        List<OrderProductDto> orderProductDtos = new ArrayList<>();
+        List<OrderDetailsDto> orderDetailsDtos = new ArrayList<>();
         orders.forEach(order -> {
-            order.getProductsQuantity().forEach((productId, quantity) -> {
-                ProductDto productDto = webClient.get()
-                        .uri(INVENTORY_URL + "product/" + productId)
-                        .retrieve()
-                        .bodyToMono(ProductDto.class)
-                        .block();
-                orderProductDtos.add(OrderProductDto.builder()
-                        .id(order.getId())
-                        .productId(productId)
-                        .name(productDto.getName())
-                        .quantity(quantity)
-                        .price(productDto.getPrice()) // Assuming price is available in ProductDto
-                        .image(productDto.getImage())
-                        .date(order.getDate())
-                        .build());
-            });
-        });
+            int total = order.getOrderProducts().stream()
+                    .mapToInt(orderProduct -> orderProduct.getPrice() * orderProduct.getQuantity())
+                    .sum();
 
-        return ResponseEntity.ok(orderProductDtos);
+            OrderDetailsDto orderDetailsDto = OrderDetailsDto.builder()
+                    .id(order.getId())
+                    .date(order.getDate())
+                    .status(order.getStatus())
+                    .items(order.getOrderProducts().size())
+                    .total(total)
+                    .build();
+
+            orderDetailsDtos.add(orderDetailsDto);
+        });
+        return ResponseEntity.ok(orderDetailsDtos);
     }
 
 

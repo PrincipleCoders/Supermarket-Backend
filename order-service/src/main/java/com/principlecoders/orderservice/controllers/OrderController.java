@@ -1,7 +1,6 @@
 package com.principlecoders.orderservice.controllers;
 
 import com.principlecoders.common.dto.CartItemDto;
-import com.principlecoders.orderservice.models.Order;
 import com.principlecoders.orderservice.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +22,9 @@ public class OrderController {
     }
 
 
-
     @GetMapping("order/user/{userId}")
-    public ResponseEntity<?> getOrderOfUser(@PathVariable String userId) {
-        return orderService.getOrderItemsOfUser(userId);
+    public ResponseEntity<?> getOrderDetailsOfUser(@PathVariable String userId) {
+        return orderService.getOrderDetailsOfUser(userId);
     }
 
 
