@@ -15,15 +15,20 @@ public class FirebaseConfig {
 
     public FirebaseApp initFirebaseApp() {
         try {
-            FileInputStream serviceAccount = new FileInputStream("user-service/src/main/resources/firebaseKey.json");
+            if (FirebaseApp.getApps().isEmpty()) {
+                FileInputStream serviceAccount =
+                        new FileInputStream("api-gateway/src/main/resources/firebaseKey.json");
 
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .setDatabaseUrl("https://principlecoders-ecommerce.firebaseio.com")
+                        .build();
 
-            FirebaseApp app = FirebaseApp.initializeApp(options);
-            System.out.println("firebase initialized");
-            return app;
+                return FirebaseApp.initializeApp(options);
+            }
+            else {
+                return FirebaseApp.getInstance();
+            }
         }
         catch (IOException e) {
             System.out.println("firebase error" + e.getMessage());
