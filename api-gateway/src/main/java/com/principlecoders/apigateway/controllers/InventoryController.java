@@ -30,18 +30,6 @@ public class InventoryController {
                 .onErrorResume(webClientErrorHandler::handle);
     }
 
-
-    @DeleteMapping("cart/{cartId}/product/{productId}")
-    public Mono<?> deleteProduct(@PathVariable String cartId,@PathVariable String productId) {
-        String invUrl = INVENTORY_URL + "cart/" + cartId + "/product/" + productId;
-        return webClient.delete()
-                .uri(invUrl)
-                .header("api-key", INVENTORY_API_KEY)
-                .retrieve()
-                .toEntity(Object.class)
-                .onErrorResume(webClientErrorHandler::handle);
-    }
-
     @PostMapping("product")
     public Mono<?> addProduct(@RequestBody ProductDto productDto) {
         String invUrl = INVENTORY_URL + "product";
@@ -65,4 +53,7 @@ public class InventoryController {
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
     }
+
+
+
 }

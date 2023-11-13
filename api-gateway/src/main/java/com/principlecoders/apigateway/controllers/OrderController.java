@@ -55,7 +55,7 @@ public class OrderController {
     }
 
     @DeleteMapping("cart/user/{userId}/product/{productId}")
-    public Mono<?> deleteProduct(@PathVariable String userId, @PathVariable String productId) {
+    public Mono<?> deleteCartItem(@PathVariable String userId, @PathVariable String productId) {
         String ordUrl = ORDER_URL + "cart/user/" + userId + "/product/" + productId;
 
         return webClient.delete()

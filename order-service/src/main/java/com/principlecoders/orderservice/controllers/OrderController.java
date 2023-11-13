@@ -23,7 +23,7 @@ public class OrderController {
     }
 
     @DeleteMapping("cart/user/{userId}/product/{productId}")
-    public ResponseEntity<?> deleteProduct(@PathVariable String userId, @PathVariable String productId) {
+    public ResponseEntity<?> deleteCartItem(@PathVariable String userId, @PathVariable String productId) {
         return orderService.deleteCartItem(userId, productId);
     }
 
