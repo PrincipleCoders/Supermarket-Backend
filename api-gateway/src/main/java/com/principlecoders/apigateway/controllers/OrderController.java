@@ -79,4 +79,16 @@ public class OrderController {
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
     }
+
+    @GetMapping("user/all")
+    public Mono<?> getAllOrdersOfUsers() {
+        String ordUrl = ORDER_URL + "user/all";
+
+        return webClient.get()
+                .uri(ordUrl)
+                .header("api-key", ORDER_API_KEY)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }

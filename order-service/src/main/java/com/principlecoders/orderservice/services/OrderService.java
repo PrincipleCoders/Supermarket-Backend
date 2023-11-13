@@ -143,22 +143,28 @@ public class OrderService {
         }
 
         List<CustomerOrderDto> customerOrderDtos = new ArrayList<>();
-        orders.forEach(order -> {
-            OrderDetailsDto orderDetailsDto = getOrderDetailDtos(orders).get(0);
-            UserDto userDto = getUserFromService(order.getUserId());
+        try {
+            orders.forEach(order -> {
+                OrderDetailsDto orderDetailsDto = getOrderDetailDtos(orders).get(0);
+                UserDto userDto = getUserFromService(order.getUserId());
 
-            customerOrderDtos.add(CustomerOrderDto.builder()
-                    .id(order.getId())
-                    .date(order.getDate())
-                    .status(order.getStatus())
-                    .total(orderDetailsDto.getTotal())
-                    .items(orderDetailsDto.getItems())
-                    .customer(userDto.getName())
-                    .address(userDto.getAddress())
-                    .telephone(userDto.getTelephone())
-                    .build());
-        });
-        return ResponseEntity.ok(customerOrderDtos);
+                customerOrderDtos.add(CustomerOrderDto.builder()
+                        .id(order.getId())
+                        .date(order.getDate())
+                        .status(order.getStatus())
+                        .total(orderDetailsDto.getTotal())
+                        .items(orderDetailsDto.getItems())
+                        .customer(userDto.getName())
+                        .address(userDto.getAddress())
+                        .telephone(userDto.getTelephone())
+                        .build());
+            });
+            return ResponseEntity.ok(customerOrderDtos);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
     }
 
     public ResponseEntity<?> checkout(String userId) {
