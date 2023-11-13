@@ -18,7 +18,7 @@ public class UserController {
     private final WebClientErrorHandler webClientErrorHandler;
     @GetMapping("/all")
     public Mono<?> getAllUsers() {
-        String userUrl = USER_URL + "user/all";
+        String userUrl = USER_URL + "all";
 
         return webClient.get()
                 .uri(userUrl)

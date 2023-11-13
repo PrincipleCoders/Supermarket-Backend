@@ -17,7 +17,7 @@ public class AuthController {
         return authService.validateLogin(accessToken);
     }
 
-    @PostMapping("auth/setUserRole")
+    @PutMapping("auth/role")
     public ResponseEntity<?> setUserRole(@RequestBody UserRoleDto userRole) {
         return authService.setUserRole(userRole.getUserId(), userRole.getRole());
     }

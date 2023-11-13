@@ -1,9 +1,6 @@
 package com.principlecoders.userservice.services;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.GetUsersResult;
-import com.google.firebase.auth.UserRecord;
+import com.google.firebase.auth.*;
 import com.principlecoders.common.dto.AdditionalDataDto;
 import com.principlecoders.common.dto.AuthResultDto;
 import com.principlecoders.common.dto.UserDto;
@@ -38,24 +35,25 @@ public class UserService {
 
     public ResponseEntity<?> getAllUsers() {
         try {
-            GetUsersResult users = firebaseAuth.getUsers(null);
+            ListUsersPage users = firebaseAuth.listUsers(null);
 
             List<AuthResultDto> authResultDtos = new ArrayList<>();
-            users.getUsers().forEach(user -> {
-                UserRoles role = UserRoles.valueOf(user.getCustomClaims().get("role").toString());
-                String address = user.getCustomClaims().get("address").toString();
-                String telephone = user.getCustomClaims().get("telephone").toString();
+            users.getValues().forEach(userRecord -> {
+                String address = String.valueOf(userRecord.getCustomClaims().get("address"));
+                String telephone = String.valueOf(userRecord.getCustomClaims().get("telephone"));
+                String role = String.valueOf(userRecord.getCustomClaims().get("role"));
 
                 AuthResultDto authResultDto = AuthResultDto.builder()
-                        .id(user.getUid())
-                        .email(user.getEmail())
-                        .name(user.getDisplayName())
-                        .role(role)
-                        .isEmailVerified(user.isEmailVerified())
-                        .address(address)
+                        .id(userRecord.getUid())
+                        .name(userRecord.getDisplayName())
+                        .email(userRecord.getEmail())
                         .telephone(telephone)
-                        .imageUrl(user.getPhotoUrl())
+                        .address(address)
+                        .role(UserRoles.valueOf(role))
+                        .isEmailVerified(userRecord.isEmailVerified())
+                        .imageUrl(userRecord.getPhotoUrl())
                         .build();
+
                 authResultDtos.add(authResultDto);
             });
             return ResponseEntity

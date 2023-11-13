@@ -30,14 +30,14 @@ public class AuthController {
                 .onErrorResume(webClientErrorHandler::handle);
     }
 
-    @PostMapping("setUserRole")
-    public Mono<?> setUserRole(@RequestHeader("Authorization") String accessToken, @RequestBody UserRoleDto userRole) {
-        String userUrl = USER_URL + "auth/setUserRole";
+    @PutMapping("user/role")
+    public Mono<?> setUserRole(@RequestBody UserRoleDto userRole) {
+        String userUrl = USER_URL + "auth/role";
 
-        return webClient.post()
+        return webClient.put()
                 .uri(userUrl)
                 .header("api-key", USER_API_KEY)
-                .body(Mono.just(userRole), UserRoleDto.class)
+                .bodyValue(userRole)
                 .retrieve()
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
