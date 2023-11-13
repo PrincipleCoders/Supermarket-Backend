@@ -65,4 +65,18 @@ public class OrderController {
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
     }
+
+
+    @PostMapping("checkout/user/{userId}")
+    public Mono<?> checkout(@PathVariable String userId) {
+        String ordUrl = ORDER_URL + "checkout/user/" + userId;
+
+        return webClient.post()
+                .uri(ordUrl)
+                .header("api-key", ORDER_API_KEY)
+                .bodyValue(userId)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }

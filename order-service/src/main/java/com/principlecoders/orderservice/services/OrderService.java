@@ -164,20 +164,38 @@ public class OrderService {
     public ResponseEntity<?> checkout(String userId) {
         Cart cart = cartRepository.findByUserId(userId);
         if (cart == null || cart.getProductsQuantity().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        List<OrderProduct> orderProducts = new ArrayList<>();
-        cart.getProductsQuantity().forEach((productId, quantity) -> {
-            ProductDto productDto = getProductFromService(productId);
-            orderProducts.add(OrderProduct.builder()
-                    .productId(productId)
-                    .quantity(quantity)
-                    .price(productDto.getPrice())
-                    .build());
+        List<OrderProduct> orderProducts;
+        try {
+            orderProducts = new ArrayList<>();
+            cart.getProductsQuantity().forEach((productId, quantity) -> {
+                ProductDto productDto = getProductFromService(productId);
+                if (productDto.getQuantity() < quantity) {
+                    System.out.println("not enough quantity of product: "+productDto.getName());
+                    throw new RuntimeException("not enough quantity of product: "+productDto.getName());
+                }
 
-            decreaseProductQuantityFromService(productId, quantity);
-        });
+                orderProducts.add(OrderProduct.builder()
+                        .productId(productId)
+                        .quantity(quantity)
+                        .price(productDto.getPrice())
+                        .build());
+            });
+
+            orderProducts.forEach(orderProduct -> {
+                ProductDto productDto = decreaseProductQuantityFromService(orderProduct.getProductId(), orderProduct.getQuantity());
+                System.out.println("product quantity decreased: "+productDto);
+                if (productDto == null) {
+                    throw new RuntimeException("Error while decreasing product quantity");
+                }
+            });
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
 
         Order newOrder = orderRepository.save(Order.builder()
                 .userId(userId)
@@ -194,7 +212,6 @@ public class OrderService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
 
 
@@ -257,8 +274,7 @@ public class OrderService {
 
     private ProductDto decreaseProductQuantityFromService(String productId, int decrement) {
         return webClient.put()
-                .uri(INVENTORY_URL + "product/" + productId + "/quantity/decrease")
-                .body(decrement, Integer.class)
+                .uri(INVENTORY_URL + "product/" + productId + "/quantity/decrease/"+decrement)
                 .header("api-key", INVENTORY_API_KEY)
                 .retrieve()
                 .bodyToMono(ProductDto.class)

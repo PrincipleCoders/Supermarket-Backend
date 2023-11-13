@@ -47,8 +47,8 @@ public class OrderController {
         return orderService.getAllOrdersOfUsers();
     }
 
-    @PostMapping("checkout")
-    public ResponseEntity<?> checkout(@RequestBody String userId) {
+    @PostMapping("checkout/user/{userId}")
+    public ResponseEntity<?> checkout(@PathVariable String userId) {
         return orderService.checkout(userId);
     }
 }

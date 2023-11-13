@@ -32,8 +32,9 @@ public class InventoryController {
         return inventoryService.updateProductQuantity(productId, quantity);
     }
 
-    @PutMapping("product/{productId}/quantity/decrease")
-    public ResponseEntity<?> decreaseProductQuantity(@PathVariable String productId, @RequestBody int decrement) {
+    @PutMapping("product/{productId}/quantity/decrease/{decrement}")
+    public ResponseEntity<?> decreaseProductQuantity(@PathVariable String productId, @PathVariable int decrement) {
+        System.out.println(decrement);
         return inventoryService.decreaseProductQuantity(productId, decrement);
     }
 }
