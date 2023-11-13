@@ -52,13 +52,23 @@ public class InventoryService {
         }
     }
 
-    public ResponseEntity<?> updateProductQuantity(String productId, int quantity) {
-        Optional<Product> product = productRepository.findById(productId);
+    public ResponseEntity<?> updateProduct(ProductDto productDto) {
+        Optional<Product> product = productRepository.findById(productDto.getId());
         if (product.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        product.get().setQuantity(quantity);
-        return ResponseEntity.ok(productRepository.save(product.get()));
+        Product newProduct = Product.builder()
+                .id(productDto.getId())
+                .name(productDto.getName())
+                .description(productDto.getDescription())
+                .image(productDto.getImage())
+                .price(productDto.getPrice())
+                .quantity(productDto.getQuantity())
+                .rating(productDto.getRating())
+                .supplier(productDto.getSupplier())
+                .category(productDto.getCategory())
+                .build();
+        return ResponseEntity.ok(productRepository.save(newProduct));
     }
 
     public ResponseEntity<?> decreaseProductQuantity(String productId, int decrement) {

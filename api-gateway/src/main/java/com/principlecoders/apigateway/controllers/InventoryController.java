@@ -54,6 +54,16 @@ public class InventoryController {
                 .onErrorResume(webClientErrorHandler::handle);
     }
 
+    @PutMapping("product")
+    public Mono<?> updateProduct(@RequestBody ProductDto productDto) {
+        String ordUrl = INVENTORY_URL + "product";
 
-
+        return webClient.put()
+                .uri(ordUrl)
+                .header("api-key", INVENTORY_API_KEY)
+                .bodyValue(productDto)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }
