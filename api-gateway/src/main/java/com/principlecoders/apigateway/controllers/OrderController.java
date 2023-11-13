@@ -40,4 +40,17 @@ public class OrderController {
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
     }
+
+
+    @GetMapping("cart/user/{userId}")
+    public Mono<?> getCartOfUser(@PathVariable String userId) {
+        String ordUrl = ORDER_URL + "cart/user/" + userId;
+
+        return webClient.get()
+                .uri(ordUrl)
+                .header("api-key", ORDER_API_KEY)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }
