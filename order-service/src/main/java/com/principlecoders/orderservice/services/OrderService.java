@@ -75,19 +75,18 @@ public class OrderService {
 
     public ResponseEntity<?> deleteCartItem(String userId, String productId) {
         Cart cart = cartRepository.findByUserId(userId);
-        if (cart.getId()!=null) {
+        if (cart!=null) {
             Map<String, Integer> productsQuantity = cart.getProductsQuantity();
             if (productsQuantity.containsKey(productId)) {
                 productsQuantity.remove(productId);
                 cart.setProductsQuantity(productsQuantity);
                 cartRepository.save(cart);
-                return ResponseEntity.ok("Item deleted from the cart");
+                return ResponseEntity.status(HttpStatus.OK).body("Item removed from the cart");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found in the cart");
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Item not found in the cart");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("cart not found");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Cart not found");
         }
     }
 
@@ -126,7 +125,7 @@ public class OrderService {
                     .body(newOrder+" "+deliveryDto);
         } else {
             boolean isDeleted = deleteDeliveryRecordFromService(orderId);
-            return ResponseEntity.status(HttpStatus.OK).body(isDeleted);
+            return ResponseEntity.ok().body(isDeleted);
         }
     }
 

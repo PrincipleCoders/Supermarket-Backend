@@ -53,4 +53,16 @@ public class OrderController {
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
     }
+
+    @DeleteMapping("cart/user/{userId}/product/{productId}")
+    public Mono<?> deleteProduct(@PathVariable String userId, @PathVariable String productId) {
+        String ordUrl = ORDER_URL + "cart/user/" + userId + "/product/" + productId;
+
+        return webClient.delete()
+                .uri(ordUrl)
+                .header("api-key", ORDER_API_KEY)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }
