@@ -3,6 +3,7 @@ package com.principlecoders.userservice.services;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.GetUsersResult;
+import com.google.firebase.auth.UserRecord;
 import com.principlecoders.common.dto.AdditionalDataDto;
 import com.principlecoders.common.dto.AuthResultDto;
 import com.principlecoders.common.dto.UserDto;
@@ -69,13 +70,26 @@ public class UserService {
     }
 
     public ResponseEntity<?> getUserById(String userId) {
-        if (userId.equals("1")) {
-            return ResponseEntity.ok(UserDto.builder()
-                    .id("1")
-                    .name("John Doe")
-                    .build());
-        } else {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        try {
+            UserRecord user = firebaseAuth.getUser(userId);
+            String address = String.valueOf(user.getCustomClaims().get("address"));
+            String telephone = String.valueOf(user.getCustomClaims().get("telephone"));
+
+            UserDto userDto = UserDto.builder()
+                    .id(userId)
+                    .name(user.getDisplayName())
+                    .email(user.getEmail())
+                    .telephone(telephone)
+                    .address(address)
+                    .imageUrl(user.getPhotoUrl())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(userDto);
+        }
+        catch (FirebaseAuthException e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
         }
     }
 }

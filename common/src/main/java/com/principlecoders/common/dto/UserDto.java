@@ -13,4 +13,5 @@ public class UserDto {
     private String address;
     private String telephone;
     private String name;
+    private String imageUrl;
 }
