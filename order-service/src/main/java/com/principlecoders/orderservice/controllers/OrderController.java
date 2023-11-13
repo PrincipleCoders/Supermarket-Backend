@@ -17,7 +17,7 @@ public class OrderController {
         return orderService.getCartItemsOfUser(userId);
     }
 
-    @PutMapping("cart/add")
+    @PutMapping("cart")
     public ResponseEntity<?> addToCart(@RequestBody CartItemDto cartItemDto) {
         return orderService.addOrUpdateCart(cartItemDto);
     }

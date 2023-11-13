@@ -28,9 +28,9 @@ public class OrderController {
                 .onErrorResume(webClientErrorHandler::handle);
     }
 
-    @PutMapping("cart/add")
+    @PutMapping("cart")
     public Mono<?> addToCart(@RequestBody Object cart) {
-        String ordUrl = ORDER_URL + "cart/add";
+        String ordUrl = ORDER_URL + "cart";
 
         return webClient.put()
                 .uri(ordUrl)

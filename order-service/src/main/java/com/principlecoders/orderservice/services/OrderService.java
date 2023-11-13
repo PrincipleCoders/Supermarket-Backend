@@ -59,8 +59,15 @@ public class OrderService {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(newCart);
-        } else {
+        }
+        else {
             Map<String, Integer> productsQuantity = cart.getProductsQuantity();
+            ProductDto productDto = getProductFromService(cartItemDto.getProductId());
+            if (productDto.getQuantity() < cartItemDto.getQuantity()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Quantity of product is not enough");
+            }
+
             if (productsQuantity.containsKey(cartItemDto.getProductId())) {
                 productsQuantity.replace(cartItemDto.getProductId(), cartItemDto.getQuantity());
             }
