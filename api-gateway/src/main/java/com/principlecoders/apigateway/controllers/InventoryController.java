@@ -53,4 +53,16 @@ public class InventoryController {
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
     }
+
+    @DeleteMapping("product/{productId}")
+    public Mono<?> deleteProduct(@PathVariable String productId) {
+        String ordUrl = INVENTORY_URL + "product/" + productId;
+
+        return webClient.delete()
+                .uri(ordUrl)
+                .header("api-key", INVENTORY_API_KEY)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }

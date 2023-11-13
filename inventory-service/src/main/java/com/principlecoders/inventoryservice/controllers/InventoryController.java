@@ -37,4 +37,9 @@ public class InventoryController {
         System.out.println(decrement);
         return inventoryService.decreaseProductQuantity(productId, decrement);
     }
+
+    @DeleteMapping("product/{productId}")
+    public ResponseEntity<?> deleteProduct(@PathVariable String productId) {
+        return inventoryService.deleteProduct(productId);
+    }
 }

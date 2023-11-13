@@ -69,4 +69,13 @@ public class InventoryService {
         product.get().setQuantity(product.get().getQuantity() - decrement);
         return ResponseEntity.ok(productRepository.save(product.get()));
     }
+
+    public ResponseEntity<?> deleteProduct(String productId) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        productRepository.delete(product.get());
+        return ResponseEntity.ok(product);
+    }
 }
