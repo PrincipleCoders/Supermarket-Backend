@@ -91,4 +91,16 @@ public class OrderController {
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
     }
+
+    @GetMapping("remaining/all")
+    public Mono<?> getAllRemainingOrders() {
+        String ordUrl = ORDER_URL + "remaining/all";
+
+        return webClient.get()
+                .uri(ordUrl)
+                .header("api-key", ORDER_API_KEY)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }

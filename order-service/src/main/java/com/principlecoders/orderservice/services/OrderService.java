@@ -99,14 +99,41 @@ public class OrderService {
 
 
     public ResponseEntity<?> getRemainingOrders() {
-        List<Order> remainingOrders = orderRepository.findAllByPackedIsFalse();
+        List<Order> remainingOrders = orderRepository.findAllByIsPackedIsFalse();
         if (remainingOrders.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        else {
-            return ResponseEntity.ok(getOrderDetailDtos(remainingOrders));
+
+        List<RemainingOrderDto> remainingOrderDtos = new ArrayList<>();
+        try {
+            remainingOrders.forEach(order -> {
+                UserDto userDto = getUserFromService(order.getUserId());
+
+                List<ItemQuantity> itemQuantities = new ArrayList<>();
+                order.getOrderProducts().forEach(orderProduct -> {
+                    ProductDto productDto = getProductFromService(orderProduct.getProductId());
+                    itemQuantities.add(ItemQuantity.builder()
+                            .item(productDto.getName())
+                            .quantity(orderProduct.getQuantity())
+                            .build());
+                });
+
+                remainingOrderDtos.add(RemainingOrderDto.builder()
+                        .id(order.getId())
+                        .date(order.getDate())
+                        .customer(userDto.getName())
+                        .items(itemQuantities)
+                        .isPacked(order.isPacked())
+                        .build());
+            });
+            return ResponseEntity.ok(remainingOrderDtos);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
         }
     }
+
 
     public ResponseEntity<?> getOrderDetailsOfUser(String userId) {
         List<Order> orders = orderRepository.findByUserId(userId);

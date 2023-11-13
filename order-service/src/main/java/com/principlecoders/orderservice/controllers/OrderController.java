@@ -32,7 +32,7 @@ public class OrderController {
         return orderService.getOrderDetailsOfUser(userId);
     }
 
-    @GetMapping("remaining")
+    @GetMapping("remaining/all")
     public ResponseEntity<?> getRemainingOrders() {
         return orderService.getRemainingOrders();
     }
