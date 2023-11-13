@@ -16,7 +16,6 @@ public class OrderController {
     private final WebClient webClient;
     private final WebClientErrorHandler webClientErrorHandler;
 
-
     @GetMapping("user/{userId}")
     public Mono<?> getAllOrdersOfUser(@PathVariable String userId) {
         String ordUrl = ORDER_URL + "user/" + userId;
@@ -24,6 +23,19 @@ public class OrderController {
         return webClient.get()
                 .uri(ordUrl)
                 .header("api-key", ORDER_API_KEY)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
+
+    @PutMapping("cart/add")
+    public Mono<?> addToCart(@RequestBody Object cart) {
+        String ordUrl = ORDER_URL + "cart/add";
+
+        return webClient.put()
+                .uri(ordUrl)
+                .header("api-key", ORDER_API_KEY)
+                .bodyValue(cart)
                 .retrieve()
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
