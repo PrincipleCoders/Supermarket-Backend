@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @PutMapping("additionalData")
+    @PutMapping("user")
     public ResponseEntity<?> updateAdditionalData(@RequestBody AdditionalDataDto additionalData) {
         return userService.updateAdditionalData(additionalData);
     }

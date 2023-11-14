@@ -43,4 +43,16 @@ public class AuthController {
                 .onErrorResume(webClientErrorHandler::handle);
     }
 
+
+    @GetMapping("user/{userId}")
+    public Mono<?> getUserAuthResult(@PathVariable String userId) {
+        String userUrl = USER_URL + "auth/" + userId;
+
+        return webClient.get()
+                .uri(userUrl)
+                .header("api-key", USER_API_KEY)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }

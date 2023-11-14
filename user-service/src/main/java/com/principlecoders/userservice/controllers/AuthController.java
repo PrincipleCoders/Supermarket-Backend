@@ -21,4 +21,9 @@ public class AuthController {
     public ResponseEntity<?> setUserRole(@RequestBody UserRoleDto userRole) {
         return authService.setUserRole(userRole.getUserId(), userRole.getRole());
     }
+
+    @GetMapping("auth/{userId}")
+    public ResponseEntity<?> getUserAuthResult(@PathVariable String userId) {
+        return authService.getUserAuthResult(userId);
+    }
 }

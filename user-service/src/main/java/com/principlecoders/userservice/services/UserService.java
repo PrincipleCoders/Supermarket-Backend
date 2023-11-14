@@ -22,7 +22,7 @@ public class UserService {
         claims.put("address", additionalData.getAddress());
         claims.put("telephone", additionalData.getPhone());
         try {
-            firebaseAuth.setCustomUserClaims(additionalData.getId(), claims);
+            firebaseAuth.setCustomUserClaims(additionalData.getUserId(), claims);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(claims);

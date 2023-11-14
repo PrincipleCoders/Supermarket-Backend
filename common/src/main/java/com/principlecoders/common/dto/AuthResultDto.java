@@ -17,4 +17,5 @@ public class AuthResultDto {
     private UserRoles role;
     private boolean isEmailVerified;
     private String imageUrl;
+    private boolean isSocialLogin;
 }

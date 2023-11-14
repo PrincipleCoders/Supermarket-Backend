@@ -28,14 +28,14 @@ public class UserController {
                 .onErrorResume(webClientErrorHandler::handle);
     }
 
-    @PutMapping("/additionalData")
+    @PutMapping("")
     public Mono<?> updateAdditionalData(@RequestBody AdditionalDataDto additionalData) {
-        String userUrl = USER_URL + "user/all";
+        String userUrl = USER_URL + "user";
 
         return webClient.put()
                 .uri(userUrl)
                 .header("api-key", USER_API_KEY)
-                .body(Mono.just(additionalData), AdditionalDataDto.class)
+                .bodyValue(additionalData)
                 .retrieve()
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);

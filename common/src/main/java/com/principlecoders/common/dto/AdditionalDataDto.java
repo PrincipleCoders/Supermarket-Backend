@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class AdditionalDataDto {
-    private String id;
+    private String userId;
     private String address;
     private String phone;
 }

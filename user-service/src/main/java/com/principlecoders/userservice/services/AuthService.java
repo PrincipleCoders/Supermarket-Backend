@@ -51,6 +51,7 @@ public class AuthService {
                             .telephone(telephone)
                             .address(address)
                             .imageUrl(userRecord.getPhotoUrl())
+                            .isSocialLogin(userRecord.getProviderData().length > 0)
                             .build()
                     );
         }
@@ -107,6 +108,38 @@ public class AuthService {
                     .body(
                             ResponseMessage.builder()
                                     .message("Token validation failed")
+                                    .error(e.getMessage())
+                                    .build()
+                    );
+        }
+    }
+
+    public ResponseEntity<?> getUserAuthResult(String userId) {
+        try {
+            UserRecord userRecord = firebaseAuth.getUser(userId);
+            String address = (String) userRecord.getCustomClaims().get("address");
+            String telephone = (String) userRecord.getCustomClaims().get("telephone");
+            String role = (String) userRecord.getCustomClaims().get("role");
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(AuthResultDto.builder()
+                            .id(userId)
+                            .email(userRecord.getEmail())
+                            .name(userRecord.getDisplayName())
+                            .role(UserRoles.valueOf(role))
+                            .isEmailVerified(userRecord.isEmailVerified())
+                            .telephone(telephone)
+                            .address(address)
+                            .imageUrl(userRecord.getPhotoUrl())
+                            .isSocialLogin(userRecord.getProviderData().length > 0)
+                            .build()
+                    );
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(
+                            ResponseMessage.builder()
+                                    .message("User auth result fetch failed")
                                     .error(e.getMessage())
                                     .build()
                     );
