@@ -71,34 +71,40 @@ public class DeliveryService {
         }
 
         List<CustomerOrderProductsDto> customerOrderProductsDtos = new ArrayList<>();
-        deliveryReadyOrders.forEach(delivery -> {
-            OrderDto orderDto = getOrderFromService(delivery.getOrderId());
-            UserDto userDto = getUserFromService(orderDto.getUserId());
+        try {
+            deliveryReadyOrders.forEach(delivery -> {
+                OrderDto orderDto = getOrderFromService(delivery.getOrderId());
+                UserDto userDto = getUserFromService(orderDto.getUserId());
 
-            List<ItemQuantity> itemQuantities = new ArrayList<>();
-            AtomicInteger bill = new AtomicInteger();
-            orderDto.getOrderProducts().forEach(orderProduct -> {
-                ProductDto productDto = getProductFromService(orderProduct.getProductId());
-                itemQuantities.add(ItemQuantity.builder()
-                        .item(productDto.getName())
-                        .quantity(orderProduct.getQuantity())
+                List<ItemQuantity> itemQuantities = new ArrayList<>();
+                AtomicInteger bill = new AtomicInteger();
+                orderDto.getOrderProducts().forEach(orderProduct -> {
+                    ProductDto productDto = getProductFromService(orderProduct.getProductId());
+                    itemQuantities.add(ItemQuantity.builder()
+                            .item(productDto.getName())
+                            .quantity(orderProduct.getQuantity())
+                            .build());
+                    bill.addAndGet(productDto.getPrice() * orderProduct.getQuantity());
+                });
+
+                customerOrderProductsDtos.add(CustomerOrderProductsDto.builder()
+                        .id(orderDto.getId())
+                        .date(orderDto.getDate())
+                        .bill(bill.get())
+                        .items(itemQuantities)
+                        .customer(userDto.getName())
+                        .address(userDto.getAddress())
+                        .telephone(userDto.getTelephone())
+                        .isDelivered(delivery.isDelivered())
+                        .markToDeliver(delivery.isMarkToDeliver())
                         .build());
-                bill.addAndGet(productDto.getPrice() * orderProduct.getQuantity());
             });
-
-            customerOrderProductsDtos.add(CustomerOrderProductsDto.builder()
-                    .id(orderDto.getId())
-                    .date(orderDto.getDate())
-                    .bill(bill.get())
-                    .items(itemQuantities)
-                    .customer(userDto.getName())
-                    .address(userDto.getAddress())
-                    .telephone(userDto.getTelephone())
-                    .isDelivered(delivery.isDelivered())
-                    .markToDeliver(delivery.isMarkToDeliver())
-                    .build());
-        });
-        return ResponseEntity.ok(customerOrderProductsDtos);
+            return ResponseEntity.ok(customerOrderProductsDtos);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
     }
 
     public ResponseEntity<?> deleteDelivery(String orderId) {

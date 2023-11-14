@@ -257,6 +257,17 @@ public class OrderService {
     }
 
 
+    public ResponseEntity<?> getOrderById(String orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent()) {
+
+            return ResponseEntity.ok(order);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+    }
+
+
 
     private List<OrderDetailsDto> getOrderDetailDtos(List<Order> orders) {
         List<OrderDetailsDto> orderDetailsDtos = new ArrayList<>();

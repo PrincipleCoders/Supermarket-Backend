@@ -51,4 +51,9 @@ public class OrderController {
     public ResponseEntity<?> checkout(@PathVariable String userId) {
         return orderService.checkout(userId);
     }
+
+    @GetMapping("{orderId}")
+    public ResponseEntity<?> getOrderById(@PathVariable String orderId) {
+        return orderService.getOrderById(orderId);
+    }
 }
