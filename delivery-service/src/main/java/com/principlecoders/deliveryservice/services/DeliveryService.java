@@ -48,12 +48,12 @@ public class DeliveryService {
         }
     }
 
-    public ResponseEntity<?> createDelivery(DeliveryDto deliveryDto) {
+    public ResponseEntity<?> createDelivery(String orderId) {
         Delivery newDelivery = deliveryRepository.save(Delivery.builder()
-                .orderId(deliveryDto.getOrderId())
-                .markToDeliver(deliveryDto.isMarkToDeliver())
-                .isDelivered(deliveryDto.isDelivered())
-                .delivererId(deliveryDto.getDelivererId())
+                .orderId(orderId)
+                .markToDeliver(false)
+                .isDelivered(false)
+                .delivererId(null)
                 .build());
 
         if (newDelivery.getId() != null) {
@@ -99,6 +99,18 @@ public class DeliveryService {
                     .build());
         });
         return ResponseEntity.ok(customerOrderProductsDtos);
+    }
+
+    public ResponseEntity<?> deleteDelivery(String orderId) {
+        Optional<Delivery> optionalDelivery = deliveryRepository.findByOrderId(orderId);
+
+        if (optionalDelivery.isPresent()) {
+            deliveryRepository.delete(optionalDelivery.get());
+            return ResponseEntity.ok().body("Delivery deleted successfully");
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
     }
 
 

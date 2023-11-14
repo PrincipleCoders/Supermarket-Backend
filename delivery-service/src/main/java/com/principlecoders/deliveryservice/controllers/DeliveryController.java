@@ -23,9 +23,14 @@ public class DeliveryController {
         return deliveryService.updateDelivered(deliveryId, isDelivered);
     }
 
-    @PostMapping("")
-    public ResponseEntity<?> createDelivery(@RequestBody DeliveryDto deliveryDto) {
-        return deliveryService.createDelivery(deliveryDto);
+    @PostMapping("order/{orderId}")
+    public ResponseEntity<?> createDelivery(@PathVariable String orderId) {
+        return deliveryService.createDelivery(orderId);
+    }
+
+    @DeleteMapping("order/{orderId}")
+    public ResponseEntity<?> deleteDelivery(@PathVariable String orderId) {
+        return deliveryService.deleteDelivery(orderId);
     }
 
     @GetMapping("order/ready/all")

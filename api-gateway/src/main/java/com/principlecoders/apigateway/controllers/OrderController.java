@@ -103,4 +103,17 @@ public class OrderController {
                 .toEntity(Object.class)
                 .onErrorResume(webClientErrorHandler::handle);
     }
+
+    @PutMapping("{orderId}/isPacked/{isPacked}")
+    public Mono<?> updateOrderStatus(@PathVariable String orderId, @PathVariable boolean isPacked) {
+        String ordUrl = ORDER_URL + orderId + "/isPacked/" + isPacked;
+
+        return webClient.put()
+                .uri(ordUrl)
+                .header("api-key", ORDER_API_KEY)
+                .bodyValue(isPacked)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
 }

@@ -37,8 +37,8 @@ public class OrderController {
         return orderService.getRemainingOrders();
     }
 
-    @PutMapping("status/{orderId}")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable String orderId, @RequestBody boolean isPacked) {
+    @PutMapping("{orderId}/isPacked/{isPacked}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable String orderId, @PathVariable boolean isPacked) {
         return orderService.updateOrderStatus(orderId, isPacked);
     }
 
