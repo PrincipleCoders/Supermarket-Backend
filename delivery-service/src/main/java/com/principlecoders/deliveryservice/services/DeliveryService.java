@@ -23,8 +23,8 @@ public class DeliveryService {
     private final DeliveryRepository deliveryRepository;
     private final WebClient webClient;
 
-    public ResponseEntity<?> updateMarkToDeliverStatus(String deliveryId, boolean status) {
-        Optional<Delivery> optionalDelivery = deliveryRepository.findById(deliveryId);
+    public ResponseEntity<?> updateMarkToDeliverStatus(String orderId, boolean status) {
+        Optional<Delivery> optionalDelivery = deliveryRepository.findByOrderId(orderId);
 
         if (optionalDelivery.isPresent()) {
             Delivery delivery = optionalDelivery.get();
@@ -35,8 +35,8 @@ public class DeliveryService {
         }
     }
 
-    public ResponseEntity<?> updateDelivered(String deliveryId, boolean isDelivered) {
-        Optional<Delivery> optionalDelivery = deliveryRepository.findById(deliveryId);
+    public ResponseEntity<?> updateDelivered(String orderId, boolean isDelivered) {
+        Optional<Delivery> optionalDelivery = deliveryRepository.findByOrderId(orderId);
 
         if (optionalDelivery.isPresent()) {
             Delivery delivery = optionalDelivery.get();
@@ -65,7 +65,7 @@ public class DeliveryService {
     }
 
     public ResponseEntity<?> getAllReadyToDeliverOrders() {
-        List<Delivery> deliveryReadyOrders = deliveryRepository.findAllByMarkToDeliverIsFalse();
+        List<Delivery> deliveryReadyOrders = deliveryRepository.findAll();
         if (deliveryReadyOrders.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }

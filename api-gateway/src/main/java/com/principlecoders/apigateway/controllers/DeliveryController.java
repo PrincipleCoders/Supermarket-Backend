@@ -2,9 +2,7 @@ package com.principlecoders.apigateway.controllers;
 
 import com.principlecoders.common.helpers.WebClientErrorHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +21,31 @@ public class DeliveryController {
         String delUrl = DELIVERY_URL + "order/ready/all";
 
         return webClient.get()
+                .uri(delUrl)
+                .header("api-key", DELIVERY_API_KEY)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
+
+    @PutMapping("markToDeliverStatus/{orderId}/{status}")
+    public Mono<?> updateMarkToDeliverStatus(@PathVariable String orderId, @PathVariable boolean status) {
+        String delUrl = DELIVERY_URL + "markToDeliverStatus/" + orderId + "/" + status;
+
+        return webClient.put()
+                .uri(delUrl)
+                .header("api-key", DELIVERY_API_KEY)
+                .retrieve()
+                .toEntity(Object.class)
+                .onErrorResume(webClientErrorHandler::handle);
+    }
+
+
+    @PutMapping("delivered/{orderId}/{status}")
+    public Mono<?> updateDelivered(@PathVariable String orderId, @PathVariable boolean status) {
+        String delUrl = DELIVERY_URL + "delivered/" + orderId + "/" + status;
+
+        return webClient.put()
                 .uri(delUrl)
                 .header("api-key", DELIVERY_API_KEY)
                 .retrieve()

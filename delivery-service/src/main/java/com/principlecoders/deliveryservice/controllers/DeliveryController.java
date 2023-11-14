@@ -13,14 +13,14 @@ public class DeliveryController {
 
     private final DeliveryService deliveryService;
 
-    @PutMapping("markToDeliverStatus/{deliveryId}")
-    public ResponseEntity<?> updateMarkToDeliverStatus(@PathVariable String deliveryId, @RequestBody boolean markToDeliver) {
-        return deliveryService.updateMarkToDeliverStatus(deliveryId, markToDeliver);
+    @PutMapping("markToDeliverStatus/{orderId}/{status}")
+    public ResponseEntity<?> updateMarkToDeliverStatus(@PathVariable String orderId, @PathVariable boolean status) {
+        return deliveryService.updateMarkToDeliverStatus(orderId, status);
     }
 
-    @PutMapping("deliveredStatus/{deliveryId}")
-    public ResponseEntity<?> updateDelivered(@PathVariable String deliveryId, @RequestBody boolean isDelivered) {
-        return deliveryService.updateDelivered(deliveryId, isDelivered);
+    @PutMapping("delivered/{orderId}/{status}")
+    public ResponseEntity<?> updateDelivered(@PathVariable String orderId, @PathVariable boolean status) {
+        return deliveryService.updateDelivered(orderId, status);
     }
 
     @PostMapping("order/{orderId}")
