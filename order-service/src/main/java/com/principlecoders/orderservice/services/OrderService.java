@@ -160,6 +160,7 @@ public class OrderService {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         order.setPacked(isPacked);
+        order.setStatus(isPacked ? "ready to deliver" : "processing");
         Order newOrder = orderRepository.save(order);
 
         if (isPacked) {
