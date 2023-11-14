@@ -3,6 +3,7 @@ package com.principlecoders.common.dto;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,5 +15,5 @@ public class OrderDetailsDto {
     private Date date;
     private String status;
     private int total;
-    private int items;
+    private List<ItemQuantity> items;
 }

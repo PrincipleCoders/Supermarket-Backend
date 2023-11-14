@@ -140,10 +140,19 @@ public class OrderService {
         if (orders.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        else {
-            return ResponseEntity.ok(getOrderDetailDtos(orders));
+
+        List<OrderDetailsDto> orderDetailsDtos;
+        try {
+            orderDetailsDtos = getOrderDetailDtos(orders);
+            return ResponseEntity.ok(orderDetailsDtos);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
         }
     }
+
+
 
     public ResponseEntity<?> updateOrderStatus(String orderId, boolean isPacked) {
         Order order = orderRepository.findById(orderId).orElse(null);
@@ -180,7 +189,7 @@ public class OrderService {
                         .date(order.getDate())
                         .status(order.getStatus())
                         .total(orderDetailsDto.getTotal())
-                        .items(orderDetailsDto.getItems())
+                        .items(orderDetailsDto.getItems().size())
                         .customer(userDto.getName())
                         .address(userDto.getAddress())
                         .telephone(userDto.getTelephone())
@@ -255,11 +264,20 @@ public class OrderService {
                     .mapToInt(orderProduct -> orderProduct.getPrice() * orderProduct.getQuantity())
                     .sum();
 
+            List<ItemQuantity> itemQuantities = new ArrayList<>();
+            order.getOrderProducts().forEach(orderProduct -> {
+                ProductDto productDto = getProductFromService(orderProduct.getProductId());
+                itemQuantities.add(ItemQuantity.builder()
+                        .item(productDto.getName())
+                        .quantity(orderProduct.getQuantity())
+                        .build());
+            });
+
             OrderDetailsDto orderDetailsDto = OrderDetailsDto.builder()
                     .id(order.getId())
                     .date(order.getDate())
                     .status(order.getStatus())
-                    .items(order.getOrderProducts().size())
+                    .items(itemQuantities)
                     .total(total)
                     .build();
 
