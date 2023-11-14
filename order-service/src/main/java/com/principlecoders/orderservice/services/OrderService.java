@@ -165,7 +165,7 @@ public class OrderService {
         if (isPacked) {
             DeliveryDto deliveryDto = makeDeliveryRecordFromService(orderId);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(newOrder+" "+deliveryDto);
+                    .body(deliveryDto);
         } else {
             boolean isDeleted = deleteDeliveryRecordFromService(orderId);
             return ResponseEntity.ok().body(isDeleted);
